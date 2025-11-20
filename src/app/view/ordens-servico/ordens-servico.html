@@ -1,0 +1,44 @@
+<div class="container-xxl mb-4 pt-5 bg-body">
+  <app-titulo title="Ordens de Serviço" subtitle="Gerencie todas as ordens de serviço" />
+
+  <app-pesquisa-filtro
+    [listFiltro]="listFiltro"
+    (receberFiltro)="receberFiltro($event)"
+    (pesquisa)="receberInputText($event)"
+    label="Pesquise por OS, cliente ou placa..."
+  />
+
+  <div class="row bg-body mt-5 border border-1 border-body border-opacity-25 rounded-4 pt-3">
+    <app-tabela [cabecario]="cabecalho">
+      @for (item of listaOS; track $index) {
+      <tr>
+        <th scope="row ">{{ item.os }}</th>
+        <td>{{ item.cliente }}</td>
+        <td>
+          {{ item.veiculo.placa }} <span class="text-muted d-block">{{ item.veiculo.modelo }}</span>
+        </td>
+        <td>{{ item.mecanico }}</td>
+        <td>
+          <span
+            class="badge fw-semibold"
+            [ngClass]="{
+              'bg-secondary-mecanica':
+                item.status === 'Em Andamento' || item.status === 'Aguardando Peças',
+              'bg-success': item.status === 'Finalizada',
+              'bg-primary': item.status === 'Entregue',
+              'bg-secondary': item.status === 'Aberta'
+            }"
+          >
+            {{ item.status }}</span
+          >
+        </td>
+        <td>{{ item.dataAbertura }}</td>
+        <td>R$ {{ item.valor }}</td>
+        <td>
+          <button class="btn"><i class="bi bi-eye-fill"></i></button>
+        </td>
+      </tr>
+      }
+    </app-tabela>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+// 1. Carrega suas variáveis como módulo
+@use './styles/variables' as *;
+
+// 2. Carrega Bootstrap e aplica suas alterações
+@use 'bootstrap/scss/bootstrap' as * with (
+  $theme-colors: $theme-colors,
+  $font-family-sans-serif: 'Roboto, sans-serif',
+  $font-family-base: 'Roboto'
+);
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');

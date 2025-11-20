@@ -1,0 +1,73 @@
+<main class="container-xxl py-5">
+  <div class="row justify-content-between align-items-center">
+    <div class="col-6">
+      <app-titulo
+        title="Gerenciamento de Usuários"
+        subtitle="Cadastre e gerencie atendentes e
+        mecânicos"
+      />
+    </div>
+    <div class="col-3 text-end">
+      <button class="btn btn-primary-mecanica">
+        <i class="bi bi-person-plus-fill"></i> Novo usuario
+      </button>
+    </div>
+  </div>
+
+  <div class="row mt-5 row-gap-2">
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      <app-card title="Total" num="3"><i class="bi bi-person"></i></app-card>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      <app-card title="Administradores" num="1"><i class="bi bi-person"></i></app-card>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      <app-card title="Atendentes" num="3"><i class="bi bi-person"></i></app-card>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-3">
+      <app-card title="Mecânicos" num="3"><i class="bi bi-person"></i></app-card>
+    </div>
+  </div>
+  <div class="row">
+    <app-pesquisa-filtro
+      label="Pesquise por nome ou Email..."
+      [listFiltro]="listFiltro"
+      (pesquisa)="getPesquisa($event)"
+      (receberFiltro)="getFiltro($event)"
+    />
+  </div>
+
+  <div class="row p-3 mt-5 border border-body rounded-4">
+    <h5>Usuários Cadastrados</h5>
+    <div class="row">
+      <app-tabela [cabecario]="listaCabecario">
+        @for (item of listaUsuarios; track $index) {
+        <tr>
+          <td>{{ item.nome }}</td>
+          <td>{{ item.email }}</td>
+          <td>{{ item.telefone }}</td>
+          <td>{{ item.cpf }}</td>
+
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-primary-mecanica ': item.funcao === 'Administrador',
+                'bg-secondary ': item.funcao === 'Atendente',
+                'bg-success ': item.funcao === 'Mecânico'
+              }"
+            >
+              {{ item.funcao }}
+            </span>
+          </td>
+
+          <td class="d-flex gap-3">
+            <button class="btn btn-secondary"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-secondary"><i class="bi bi-trash text-danger"></i></button>
+          </td>
+        </tr>
+        }
+      </app-tabela>
+    </div>
+  </div>
+</main>
