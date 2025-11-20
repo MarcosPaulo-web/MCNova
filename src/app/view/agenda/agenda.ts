@@ -6,7 +6,7 @@ import { Card } from '../../componentes/card/card';
 import { DatePipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardAgendamento } from '../../componentes/card-agendamento/card-agendamento';
-import { AgendamentoMecanico } from '../../shared/models/agendamento-mecanico';
+import { AgendamentoMecanico } from '../../shared/models/agendamento.model';
 
 @Component({
   selector: 'app-agenda',

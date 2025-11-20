@@ -1,4 +1,4 @@
-import { AgendamentoMecanico } from './agendamento-mecanico';
+import { AgendamentoMecanico } from './agendamento.model';
 
 describe('AgendamentoMecanico', () => {
   it('should create an instance', () => {

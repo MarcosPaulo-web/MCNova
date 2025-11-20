@@ -11,20 +11,28 @@
           <p class="text-muted">Entre com sua conta para continuar</p>
         </div>
 
+        @if (errorMessage) {
+        <div class="alert alert-danger" role="alert">
+          {{ errorMessage }}
+        </div>
+        }
+
         <div class="mb-3 mt-5">
           <label for="email" class="form-label fw-semibold">Email</label>
           <input
             type="email"
             class="form-control"
             id="email"
-            aria-describedby="emailHelp"
             formControlName="email"
             [class.is-invalid]="isInvalid('email')"
           />
-          <div class="invalid-feedback" ngIf="isInvalid('email')">
+          @if (isInvalid('email')) {
+          <div class="invalid-feedback">
             <span> Digite um email válido. </span>
           </div>
+          }
         </div>
+
         <div class="mb-3">
           <label for="senha" class="form-label fw-semibold">Senha</label>
           <input
@@ -34,14 +42,33 @@
             id="senha"
             [class.is-invalid]="isInvalid('senha')"
           />
-          <div class="invalid-feedback" ngIf="isInvalid('senha') && submitted">
-            <span> Digite uma senha de 6 digitos </span>
+          @if (isInvalid('senha')) {
+          <div class="invalid-feedback">
+            <span> Digite uma senha de no mínimo 3 caracteres </span>
           </div>
+          }
         </div>
-        <button type="submit" class="btn btn-primary-mecanica w-100">ENVIAR</button>
-        <hr class="border border-primary-mecanica opacity-100 border-1" />
+
+        <button 
+          type="submit" 
+          class="btn btn-primary-mecanica w-100"
+          [disabled]="loading"
+        >
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+          }
+          ENTRAR
+        </button>
+
+        <hr class="border border-primary-mecanica opacity-100 border-1 mt-4" />
+        
         <p class="text-center text-muted">OU CONTINUE COM</p>
-        <button type="button" class="btn btn-outline-primary-mecanica w-100" routerLink="/home">
+        
+        <button 
+          type="button" 
+          class="btn btn-outline-primary-mecanica w-100"
+          (click)="loginWithGoogle()"
+        >
           <i class="bi bi-google"></i> Google
         </button>
       </form>

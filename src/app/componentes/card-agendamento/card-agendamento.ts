@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { AgendamentoMecanico } from '../../shared/models/agendamento-mecanico';
+import { AgendamentoMecanico } from '../../shared/models/agendamento.model';
 
 @Component({
   selector: 'app-card-agendamento',

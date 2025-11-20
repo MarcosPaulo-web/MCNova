@@ -10,17 +10,57 @@ import { Orcamento } from './view/orcamento/orcamento';
 import { Usuario } from './view/usuario/usuario';
 import { Mecanico } from './view/mecanico/mecanico';
 import { Faturamento } from './view/faturamento/faturamento';
+import { AuthCallback } from './view/auth-callback/auth-callback..component';
+import { authGuard } from './shared/guards/auth.guard';
+import { roleGuard } from './shared/guards/role.guard';
 
 export const routes: Routes = [
   { path: '', component: Login },
-  { path: 'home', component: Dashboard },
-  { path: 'ordens', component: OrdensServico },
-  { path: 'agenda', component: Agenda },
-  { path: 'clientes', component: Clientes },
-  { path: 'estoque', component: Estoque },
-  { path: 'orcamento', component: Orcamento },
-  { path: 'usuario', component: Usuario },
-  { path: 'mecanico', component: Mecanico },
-  { path: 'faturamento', component: Faturamento },
+  { path: 'auth/callback', component: AuthCallback },
+  { 
+    path: 'home', 
+    component: Dashboard,
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'ordens', 
+    component: OrdensServico,
+    canActivate: [authGuard, roleGuard(['ROLE_ADMIN', 'ROLE_ATENDENTE', 'ROLE_MECANICO'])]
+  },
+  { 
+    path: 'agenda', 
+    component: Agenda,
+    canActivate: [authGuard, roleGuard(['ROLE_ADMIN', 'ROLE_ATENDENTE'])]
+  },
+  { 
+    path: 'clientes', 
+    component: Clientes,
+    canActivate: [authGuard, roleGuard(['ROLE_ADMIN', 'ROLE_ATENDENTE'])]
+  },
+  { 
+    path: 'estoque', 
+    component: Estoque,
+    canActivate: [authGuard, roleGuard(['ROLE_ADMIN', 'ROLE_ATENDENTE'])]
+  },
+  { 
+    path: 'orcamento', 
+    component: Orcamento,
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'usuario', 
+    component: Usuario,
+    canActivate: [authGuard, roleGuard(['ROLE_ADMIN'])]
+  },
+  { 
+    path: 'mecanico', 
+    component: Mecanico,
+    canActivate: [authGuard, roleGuard(['ROLE_ADMIN', 'ROLE_ATENDENTE'])]
+  },
+  { 
+    path: 'faturamento', 
+    component: Faturamento,
+    canActivate: [authGuard, roleGuard(['ROLE_ADMIN', 'ROLE_ATENDENTE'])]
+  },
   { path: '**', component: NotFound },
 ];
