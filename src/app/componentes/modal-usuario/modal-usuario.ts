@@ -44,8 +44,8 @@ export class ModalUsuario implements OnInit {
       email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
       password: ['', [Validators.minLength(3)]],
       role: ['', [Validators.required]],
-      nuTelefone: ['', [Validators.pattern(/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/)]],
-      nuCPF: ['', [Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
+      nuTelefone: ['', [Validators.pattern(/^\d{10,11}$/)]],
+      nuCPF: ['', [Validators.pattern(/^\d{11}$/)]],
     });
 
     // Se for edição, a senha não é obrigatória
@@ -59,10 +59,54 @@ export class ModalUsuario implements OnInit {
       this.form.patchValue({
         nmUsuario: this.usuario.nmUsuario,
         email: this.usuario.email,
-        role: this.usuario.roles[0], // Pega a primeira role
-        nuTelefone: this.usuario.nuTelefone,
-        nuCPF: this.usuario.nuCPF,
+        role: this.usuario.roles[0],
+        nuTelefone: this.removerFormatacao(this.usuario.nuTelefone),
+        nuCPF: this.removerFormatacao(this.usuario.nuCPF),
       });
+    }
+  }
+
+  // Remove formatação (mantém apenas números)
+  private removerFormatacao(valor: string | undefined): string {
+    if (!valor) return '';
+    return valor.replace(/\D/g, '');
+  }
+
+  // Aplica máscara de CPF enquanto digita
+  onCPFInput(event: any): void {
+    let valor = event.target.value.replace(/\D/g, '');
+    
+    if (valor.length > 11) {
+      valor = valor.substring(0, 11);
+    }
+    
+    this.form.patchValue({ nuCPF: valor }, { emitEvent: false });
+    
+    // Atualiza o campo visual com formatação
+    if (valor.length === 11) {
+      event.target.value = valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    } else {
+      event.target.value = valor;
+    }
+  }
+
+  // Aplica máscara de telefone enquanto digita
+  onTelefoneInput(event: any): void {
+    let valor = event.target.value.replace(/\D/g, '');
+    
+    if (valor.length > 11) {
+      valor = valor.substring(0, 11);
+    }
+    
+    this.form.patchValue({ nuTelefone: valor }, { emitEvent: false });
+    
+    // Atualiza o campo visual com formatação
+    if (valor.length === 11) {
+      event.target.value = valor.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    } else if (valor.length === 10) {
+      event.target.value = valor.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    } else {
+      event.target.value = valor;
     }
   }
 
@@ -120,6 +164,12 @@ export class ModalUsuario implements OnInit {
       return 'Senha deve ter no mínimo 3 caracteres';
     }
     if (control?.hasError('pattern')) {
+      if (campo === 'nuCPF') {
+        return 'CPF deve ter 11 dígitos';
+      }
+      if (campo === 'nuTelefone') {
+        return 'Telefone deve ter 10 ou 11 dígitos';
+      }
       return 'Formato inválido';
     }
     

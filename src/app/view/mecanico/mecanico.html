@@ -45,8 +45,8 @@
       @for (mecanico of mecanicosFiltrados; track mecanico.cdUsuario) {
       <tr>
         <td>{{ mecanico.nmUsuario }}</td>
-        <td>{{ mecanico.nuCPF | cpf || '-' }}</td>
-        <td>{{ mecanico.nuTelefone | telefone || '-' }}</td>
+        <td>{{ mecanico.nuCPF | cpf }}</td>
+        <td>{{ mecanico.nuTelefone | telefone }}</td>
         <td>{{ mecanico.email }}</td>
         <td>
           <span class="badge" [ngClass]="mecanico.ativo ? 'bg-success' : 'bg-danger'">

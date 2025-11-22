@@ -53,13 +53,15 @@
                 formControlName="nuCPF"
                 [class.is-invalid]="isInvalid('nuCPF')"
                 placeholder="000.000.000-00"
-                mask="000.000.000-00"
+                (input)="onCPFInput($event)"
+                maxlength="14"
               />
               @if (isInvalid('nuCPF')) {
               <div class="invalid-feedback">
                 {{ getMensagemErro('nuCPF') }}
               </div>
               }
+              <small class="text-muted">Apenas números</small>
             </div>
 
             <!-- Telefone -->
@@ -72,12 +74,15 @@
                 formControlName="nuTelefone"
                 [class.is-invalid]="isInvalid('nuTelefone')"
                 placeholder="(00) 00000-0000"
+                (input)="onTelefoneInput($event)"
+                maxlength="15"
               />
               @if (isInvalid('nuTelefone')) {
               <div class="invalid-feedback">
                 {{ getMensagemErro('nuTelefone') }}
               </div>
               }
+              <small class="text-muted">Apenas números</small>
             </div>
 
             <!-- Email -->

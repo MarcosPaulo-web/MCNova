@@ -32,8 +32,8 @@
       @for (cliente of clientesFiltrados; track cliente.cdCliente) {
       <tr>
         <td>{{ cliente.nmCliente }}</td>
-        <td>{{ cliente.nuCPF | cpf || '-' }}</td>
-        <td>{{ cliente.nuTelefone | telefone || '-' }}</td>
+      <td>{{ (cliente.nuCPF | cpf) || '-' }}</td>
+      <td>{{ (cliente.nuTelefone | telefone) || '-' }}</td>
         <td>{{ cliente.email || '-' }}</td>
         <td>{{ cliente.dsEndereco || '-' }}</td>
         <td>

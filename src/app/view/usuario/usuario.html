@@ -61,8 +61,8 @@
         <tr>
           <td>{{ usuario.nmUsuario }}</td>
           <td>{{ usuario.email }}</td>
-          <td>{{ usuario.nuTelefone | telefone || '-' }}</td>
-          <td>{{ usuario.nuCPF | cpf || '-' }}</td>
+          <td>{{ (usuario.nuTelefone | telefone) || '-' }}</td>
+          <td>{{ (usuario.nuCPF | cpf) || '-' }}</td>
           <td>
             <span class="badge" [ngClass]="getRoleClass(usuario.roles)">
               {{ getRoleLabel(usuario.roles) }}

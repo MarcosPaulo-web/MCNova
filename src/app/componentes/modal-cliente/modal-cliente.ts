@@ -14,7 +14,7 @@ declare var bootstrap: any;
   styleUrl: './modal-cliente.scss',
 })
 export class ModalCliente implements OnInit {
-  @Input() cliente?: Cliente; // Para edição
+  @Input() cliente?: Cliente;
   @Output() salvar = new EventEmitter<ClienteRequest>();
   @Output() fechar = new EventEmitter<void>();
 
@@ -35,8 +35,8 @@ export class ModalCliente implements OnInit {
   private criarForm(): void {
     this.form = this.fb.group({
       nmCliente: ['', [Validators.required, Validators.maxLength(120)]],
-      nuCPF: ['', [Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
-      nuTelefone: ['', [Validators.pattern(/^\(\d{2}\)\s?\d{4,5}-?\d{4}$/)]],
+      nuCPF: ['', [Validators.pattern(/^\d{11}$/)]],
+      nuTelefone: ['', [Validators.pattern(/^\d{10,11}$/)]],
       dsEndereco: ['', [Validators.maxLength(255)]],
       email: ['', [Validators.email, Validators.maxLength(150)]],
     });
@@ -46,11 +46,55 @@ export class ModalCliente implements OnInit {
     if (this.cliente) {
       this.form.patchValue({
         nmCliente: this.cliente.nmCliente,
-        nuCPF: this.cliente.nuCPF,
-        nuTelefone: this.cliente.nuTelefone,
+        nuCPF: this.removerFormatacao(this.cliente.nuCPF),
+        nuTelefone: this.removerFormatacao(this.cliente.nuTelefone),
         dsEndereco: this.cliente.dsEndereco,
         email: this.cliente.email,
       });
+    }
+  }
+
+  // Remove formatação (mantém apenas números)
+  private removerFormatacao(valor: string | undefined): string {
+    if (!valor) return '';
+    return valor.replace(/\D/g, '');
+  }
+
+  // Aplica máscara de CPF enquanto digita
+  onCPFInput(event: any): void {
+    let valor = event.target.value.replace(/\D/g, '');
+    
+    if (valor.length > 11) {
+      valor = valor.substring(0, 11);
+    }
+    
+    this.form.patchValue({ nuCPF: valor }, { emitEvent: false });
+    
+    // Atualiza o campo visual com formatação
+    if (valor.length === 11) {
+      event.target.value = valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    } else {
+      event.target.value = valor;
+    }
+  }
+
+  // Aplica máscara de telefone enquanto digita
+  onTelefoneInput(event: any): void {
+    let valor = event.target.value.replace(/\D/g, '');
+    
+    if (valor.length > 11) {
+      valor = valor.substring(0, 11);
+    }
+    
+    this.form.patchValue({ nuTelefone: valor }, { emitEvent: false });
+    
+    // Atualiza o campo visual com formatação
+    if (valor.length === 11) {
+      event.target.value = valor.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    } else if (valor.length === 10) {
+      event.target.value = valor.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    } else {
+      event.target.value = valor;
     }
   }
 
@@ -93,6 +137,12 @@ export class ModalCliente implements OnInit {
       return 'Email inválido';
     }
     if (control?.hasError('pattern')) {
+      if (campo === 'nuCPF') {
+        return 'CPF deve ter 11 dígitos';
+      }
+      if (campo === 'nuTelefone') {
+        return 'Telefone deve ter 10 ou 11 dígitos';
+      }
       return 'Formato inválido';
     }
     if (control?.hasError('maxLength')) {
