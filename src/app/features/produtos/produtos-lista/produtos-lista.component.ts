@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProdutoService } from '../../../core/services/produto.service';
-import { Produto, ProdutoRequest } from '../../../core/models/produto.model';
+import { Produto, ProdutoRequest } from '../../../core/models';
 
 @Component({
   selector: 'app-produtos-lista',

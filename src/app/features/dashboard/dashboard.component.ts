@@ -105,16 +105,19 @@ export class DashboardComponent implements OnInit {
     });
   }
   
-  carregarProdutosEstoqueBaixo(): void {
-  this.produtoService.buscarEstoqueBaixo().subscribe({
-    next: (produtos: Produto[]) => { // ✅ Tipagem correta
-      this.produtosEstoqueBaixo = produtos;
-    },
-    error: (err) => {
-      console.error('Erro ao carregar produtos com estoque baixo:', err);
-    }
-  });
-}
+   private carregarProdutosEstoqueBaixo(): Promise<void> {
+    return new Promise((resolve) => {
+      this.produtoService.buscarEstoqueBaixo().subscribe({
+        next: (produtos: Produto[]) => {
+          this.stats.update(s => ({ ...s, produtosEstoqueBaixo: produtos.length }));
+          resolve();
+        },
+        error: () => {
+          resolve();
+        }
+      });
+    });
+  }
   
   formatarMoeda(valor: number): string {
     return new Intl.NumberFormat('pt-BR', {
