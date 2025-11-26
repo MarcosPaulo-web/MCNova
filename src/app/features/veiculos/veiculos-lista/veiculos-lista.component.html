@@ -8,13 +8,13 @@
       </h2>
       <p class="text-muted mb-0">Gerenciamento de veículos cadastrados</p>
     </div>
-    
+
     <button class="btn btn-primary" (click)="abrirModalNovo()">
       <i class="bi bi-plus-circle me-2"></i>
       Novo Veículo
     </button>
   </div>
-  
+
   <!-- Barra de Pesquisa -->
   <div class="search-bar card">
     <div class="card-body">
@@ -32,94 +32,92 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Loading State -->
   @if (isLoading()) {
-    <div class="text-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
-      </div>
-      <p class="text-muted mt-2">Carregando veículos...</p>
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
     </div>
+    <p class="text-muted mt-2">Carregando veículos...</p>
+  </div>
   } @else {
-    <!-- Tabela de Veículos -->
-    <div class="card">
-      <div class="card-body p-0">
-        @if (veiculosFiltrados().length === 0) {
-          <div class="empty-state">
-            <i class="bi bi-inbox"></i>
-            <p>Nenhum veículo encontrado</p>
-          </div>
-        } @else {
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>Placa</th>
-                  <th>Modelo</th>
-                  <th>Marca</th>
-                  <th>Ano</th>
-                  <th>Cor</th>
-                  <th>Cliente</th>
-                  <th>Cadastro</th>
-                  <th class="text-center">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (veiculo of veiculosFiltrados(); track veiculo.cdVeiculo) {
-                  <tr>
-                    <td>
-                      <strong class="placa">{{ veiculo.placa }}</strong>
-                    </td>
-                    <td>{{ veiculo.modelo }}</td>
-                    <td>{{ veiculo.marca || '-' }}</td>
-                    <td>{{ veiculo.ano || '-' }}</td>
-                    <td>
-                      @if (veiculo.cor) {
-                        <span class="badge bg-secondary">{{ veiculo.cor }}</span>
-                      } @else {
-                        -
-                      }
-                    </td>
-                    <td>
-                      <small>{{ veiculo.cliente?.nmCliente || '-' }}</small>
-                    </td>
-                    <td>
-                      <small class="text-muted">{{ formatarData(veiculo.dataCadastro) }}</small>
-                    </td>
-                    <td class="text-center">
-                      <div class="btn-group btn-group-sm">
-                        <button
-                          class="btn btn-outline-primary"
-                          (click)="abrirModalEditar(veiculo)"
-                          title="Editar"
-                        >
-                          <i class="bi bi-pencil"></i>
-                        </button>
-                        <button
-                          class="btn btn-outline-danger"
-                          (click)="confirmarExclusao(veiculo)"
-                          title="Excluir"
-                        >
-                          <i class="bi bi-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-          
-          <!-- Rodapé com Total -->
-          <div class="table-footer">
-            <span class="text-muted">
-              Total: <strong>{{ veiculosFiltrados().length }}</strong> veículo(s)
-            </span>
-          </div>
-        }
+  <!-- Tabela de Veículos -->
+  <div class="card">
+    <div class="card-body p-0">
+      @if (veiculosFiltrados().length === 0) {
+      <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p>Nenhum veículo encontrado</p>
       </div>
+      } @else {
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Placa</th>
+              <th>Modelo</th>
+              <th>Marca</th>
+              <th>Ano</th>
+              <th>Cor</th>
+              <th>Cliente</th>
+              <th>Cadastro</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (veiculo of veiculosFiltrados(); track veiculo.cdVeiculo) {
+            <tr>
+              <td>
+                <strong class="placa">{{ veiculo.placa }}</strong>
+              </td>
+              <td>{{ veiculo.modelo }}</td>
+              <td>{{ veiculo.marca || "-" }}</td>
+              <td>{{ veiculo.ano || "-" }}</td>
+              <td>
+                @if (veiculo.cor) {
+                <span class="badge bg-secondary">{{ veiculo.cor }}</span>
+                } @else { - }
+              </td>
+              <td>
+                <small>{{ veiculo.cliente?.nmCliente || "-" }}</small>
+              </td>
+              <td>
+                <small class="text-muted">-</small>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm">
+                  <button
+                    class="btn btn-outline-primary"
+                    (click)="abrirModalEditar(veiculo)"
+                    title="Editar"
+                  >
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button
+                    class="btn btn-outline-danger"
+                    (click)="confirmarExclusao(veiculo)"
+                    title="Excluir"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Rodapé com Total -->
+      <div class="table-footer">
+        <span class="text-muted">
+          Total: <strong>{{ veiculosFiltrados().length }}</strong> veículo(s)
+        </span>
+      </div>
+      }
     </div>
+  </div>
   }
 </div>
 
@@ -130,16 +128,18 @@
       <div class="modal-header">
         <h5 class="modal-title">
           @if (modoEdicao()) {
-            <i class="bi bi-pencil me-2"></i>
-            Editar Veículo
-          } @else {
-            <i class="bi bi-plus-circle me-2"></i>
-            Novo Veículo
-          }
+          <i class="bi bi-pencil me-2"></i>
+          Editar Veículo } @else {
+          <i class="bi bi-plus-circle me-2"></i>
+          Novo Veículo }
         </h5>
-        <button type="button" class="btn-close" (click)="fecharModal()"></button>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="fecharModal()"
+        ></button>
       </div>
-      
+
       <form [formGroup]="veiculoForm" (ngSubmit)="salvar()">
         <div class="modal-body">
           <div class="row g-3">
@@ -156,16 +156,18 @@
               >
                 <option value="">Selecione o cliente</option>
                 @for (cliente of clientes(); track cliente.cdCliente) {
-                  <option [value]="cliente.cdCliente">{{ cliente.nmCliente }}</option>
+                <option [value]="cliente.cdCliente">
+                  {{ cliente.nmCliente }}
+                </option>
                 }
               </select>
               @if (isFieldInvalid('cdCliente')) {
-                <div class="invalid-feedback">
-                  {{ getFieldError('cdCliente') }}
-                </div>
+              <div class="invalid-feedback">
+                {{ getFieldError("cdCliente") }}
+              </div>
               }
             </div>
-            
+
             <!-- Placa -->
             <div class="col-md-6">
               <label for="placa" class="form-label">
@@ -182,15 +184,15 @@
                 [class.is-invalid]="isFieldInvalid('placa')"
               />
               @if (isFieldInvalid('placa')) {
-                <div class="invalid-feedback">
-                  {{ getFieldError('placa') }}
-                </div>
+              <div class="invalid-feedback">
+                {{ getFieldError("placa") }}
+              </div>
               }
               <small class="form-text text-muted">
                 Formato antigo (ABC-1234) ou Mercosul (ABC1D23)
               </small>
             </div>
-            
+
             <!-- Ano -->
             <div class="col-md-6">
               <label for="ano" class="form-label">Ano</label>
@@ -203,12 +205,12 @@
                 [class.is-invalid]="isFieldInvalid('ano')"
               />
               @if (isFieldInvalid('ano')) {
-                <div class="invalid-feedback">
-                  {{ getFieldError('ano') }}
-                </div>
+              <div class="invalid-feedback">
+                {{ getFieldError("ano") }}
+              </div>
               }
             </div>
-            
+
             <!-- Modelo -->
             <div class="col-md-12">
               <label for="modelo" class="form-label">
@@ -223,12 +225,12 @@
                 [class.is-invalid]="isFieldInvalid('modelo')"
               />
               @if (isFieldInvalid('modelo')) {
-                <div class="invalid-feedback">
-                  {{ getFieldError('modelo') }}
-                </div>
+              <div class="invalid-feedback">
+                {{ getFieldError("modelo") }}
+              </div>
               }
             </div>
-            
+
             <!-- Marca -->
             <div class="col-md-6">
               <label for="marca" class="form-label">Marca</label>
@@ -241,12 +243,12 @@
                 [class.is-invalid]="isFieldInvalid('marca')"
               />
               @if (isFieldInvalid('marca')) {
-                <div class="invalid-feedback">
-                  {{ getFieldError('marca') }}
-                </div>
+              <div class="invalid-feedback">
+                {{ getFieldError("marca") }}
+              </div>
               }
             </div>
-            
+
             <!-- Cor -->
             <div class="col-md-6">
               <label for="cor" class="form-label">Cor</label>
@@ -259,14 +261,14 @@
                 [class.is-invalid]="isFieldInvalid('cor')"
               />
               @if (isFieldInvalid('cor')) {
-                <div class="invalid-feedback">
-                  {{ getFieldError('cor') }}
-                </div>
+              <div class="invalid-feedback">
+                {{ getFieldError("cor") }}
+              </div>
               }
             </div>
           </div>
         </div>
-        
+
         <div class="modal-footer">
           <button
             type="button"
@@ -282,12 +284,10 @@
             [disabled]="isSubmitting()"
           >
             @if (isSubmitting()) {
-              <span class="spinner-border spinner-border-sm me-2"></span>
-              Salvando...
-            } @else {
-              <i class="bi bi-check-circle me-2"></i>
-              Salvar
-            }
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Salvando... } @else {
+            <i class="bi bi-check-circle me-2"></i>
+            Salvar }
           </button>
         </div>
       </form>

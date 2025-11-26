@@ -41,7 +41,7 @@ export class AgendamentosListaComponent implements OnInit {
   modoEdicao = signal(false);
   agendamentoEditando = signal<Agendamento | null>(null);
   
-  searchTerm = signal('');
+  searchTerm = '';
   filtroStatus = signal<StatusAgendamento | 'TODOS'>('TODOS');
   
   statusOptions = [
@@ -70,7 +70,6 @@ export class AgendamentosListaComponent implements OnInit {
       cdMecanico: ['', [Validators.required]],
       dataAgendamento: ['', [Validators.required]],
       horaAgendamento: ['', [Validators.required]],
-      dsServico: ['', [Validators.required, Validators.maxLength(255)]],
       observacoes: ['', [Validators.maxLength(500)]]
     });
     
@@ -161,8 +160,8 @@ export class AgendamentosListaComponent implements OnInit {
     });
   }
   
-  aplicarFiltro(): void {
-    const termo = this.searchTerm().toLowerCase();
+ aplicarFiltro(): void {
+  const termo = this.searchTerm.toLowerCase();
     let filtrados = this.agendamentos();
     
     // Filtro por status
