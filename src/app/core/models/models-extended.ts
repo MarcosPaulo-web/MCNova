@@ -3,7 +3,7 @@
 // VERSÃO CORRIGIDA - Compatível com o Backend
 // ========================================
 
-import { FormaPagamento, StatusOrdemServico, TipoServico } from './enums';
+import { FormaPagamento, StatusOrdemServico, TipoServico, StatusAgendamento } from './enums';
 
 // ==================== PRODUTO ====================
 export interface Produto {
@@ -57,7 +57,7 @@ export interface Agendamento {
   mecanico?: { cdUsuario: number; nmUsuario: string };
   dataAgendamento: string; // Data/hora do agendamento
   horario: string;
-  status: string;
+  status: StatusAgendamento;
   observacoes?: string; // Usar para descrição do serviço
 }
 
