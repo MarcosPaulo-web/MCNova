@@ -59,7 +59,6 @@
               <th>CPF</th>
               <th>Telefone</th>
               <th>Email</th>
-              <th>Cadastro</th>
               <th class="text-center">Ações</th>
             </tr>
           </thead>
@@ -72,9 +71,6 @@
               <td>{{ cliente.nuCPF || "-" }}</td>
               <td>{{ cliente.nuTelefone || "-" }}</td>
               <td>{{ cliente.email || "-" }}</td>
-              <td>
-                <small class="text-muted">-</small>
-              </td>
               <td class="text-center">
                 <div class="btn-group btn-group-sm">
                   <button
@@ -156,8 +152,8 @@
             <!-- CPF -->
             <div class="col-md-6">
               <label for="nuCPF" class="form-label"
-              >CPF <span class="text-danger">*</span>
-            </label>
+                >CPF <span class="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 class="form-control"
@@ -178,7 +174,7 @@
             <!-- Telefone -->
             <div class="col-md-6">
               <label for="nuTelefone" class="form-label">
-              Telefone <span class="text-danger">*</span>
+                Telefone <span class="text-danger">*</span>
               </label>
               <input
                 type="text"

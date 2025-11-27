@@ -126,20 +126,20 @@ export class VeiculosListaComponent implements OnInit {
   }
   
   abrirModalEditar(veiculo: Veiculo): void {
-    this.modoEdicao.set(true);
-    this.veiculoEditando.set(veiculo);
-    
-    this.veiculoForm.patchValue({
-      cdCliente: veiculo.cliente?.cdCliente || '',
-      placa: veiculo.placa,
-      modelo: veiculo.modelo,
-      marca: veiculo.marca || '',
-      ano: veiculo.ano || '',
-      cor: veiculo.cor || ''
-    });
-    
-    this.modalInstance?.show();
-  }
+  this.modoEdicao.set(true);
+  this.veiculoEditando.set(veiculo);
+  
+  this.veiculoForm.patchValue({
+    cdCliente: veiculo.cdCliente, 
+    placa: veiculo.placa,
+    modelo: veiculo.modelo,
+    marca: veiculo.marca || '',
+    ano: veiculo.ano || '',
+    cor: veiculo.cor || ''
+  });
+  
+  this.modalInstance?.show();
+}
   
   fecharModal(): void {
     this.modalInstance?.hide();

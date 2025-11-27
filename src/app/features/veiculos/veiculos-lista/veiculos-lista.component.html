@@ -1,3 +1,5 @@
+<!-- src/app/features/veiculos/veiculos-lista/veiculos-lista.component.html -->
+
 <div class="veiculos-page">
   <!-- Cabeçalho -->
   <div class="page-header">
@@ -61,7 +63,7 @@
               <th>Ano</th>
               <th>Cor</th>
               <th>Cliente</th>
-              <th>Cadastro</th>
+              <!-- ✅ REMOVIDO: Coluna Cadastro -->
               <th class="text-center">Ações</th>
             </tr>
           </thead>
@@ -80,11 +82,9 @@
                 } @else { - }
               </td>
               <td>
-                <small>{{ veiculo.cliente?.nmCliente || "-" }}</small>
+                <small>{{ getClienteNome(veiculo.cdCliente) || "-" }}</small>
               </td>
-              <td>
-                <small class="text-muted">-</small>
-              </td>
+              <!-- ✅ REMOVIDO: Coluna de data de cadastro -->
               <td class="text-center">
                 <div class="btn-group btn-group-sm">
                   <button
@@ -236,7 +236,7 @@
             <!-- Marca -->
             <div class="col-md-6">
               <label for="marca" class="form-label">
-              Marca <span class="text-danger">*</span>
+                Marca <span class="text-danger">*</span>
               </label>
               <input
                 type="text"

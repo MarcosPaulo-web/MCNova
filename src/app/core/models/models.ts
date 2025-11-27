@@ -65,19 +65,22 @@ export interface ClienteRequest {
 export interface Veiculo {
   cdVeiculo: number;
   cdCliente: number;
-  cliente?: { cdCliente: number; nmCliente: string };
   placa: string;
   modelo: string;
-  marca: string;
-  ano: number;
+  marca?: string;
+  ano?: number;
   cor?: string;
+  cliente?: {  // ✅ Objeto cliente aninhado
+    cdCliente: number;
+    nmCliente: string;
+  };
 }
 
 export interface VeiculoRequest {
   cdCliente: number;
   placa: string;
   modelo: string;
-  marca: string;
-  ano: number;
+  marca?: string;
+  ano?: number;
   cor?: string;
 }
