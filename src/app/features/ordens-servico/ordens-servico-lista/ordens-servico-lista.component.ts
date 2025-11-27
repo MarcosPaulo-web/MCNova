@@ -191,14 +191,19 @@ export class OrdensServicoListaComponent implements OnInit {
   
   carregarOrdens(): Promise<void> {
     return new Promise((resolve) => {
+      // ✅ CORRIGIDO: Buscar TODAS as ordens (incluindo concluídas e canceladas)
       Promise.all([
         this.ordemServicoService.listarPorStatus(StatusOrdemServico.AGUARDANDO).toPromise(),
         this.ordemServicoService.listarPorStatus(StatusOrdemServico.EM_ANDAMENTO).toPromise(),
+        this.ordemServicoService.listarPorStatus(StatusOrdemServico.CONCLUIDA).toPromise(),
+        this.ordemServicoService.listarPorStatus(StatusOrdemServico.CANCELADA).toPromise(),
         this.ordemServicoService.listarOrcamentosPendentes().toPromise()
-      ]).then(([aguardando, emAndamento, orcamentos]) => {
+      ]).then(([aguardando, emAndamento, concluidas, canceladas, orcamentos]) => {
         const todasOrdens = [
           ...(aguardando || []),
           ...(emAndamento || []),
+          ...(concluidas || []),
+          ...(canceladas || []),
           ...(orcamentos || [])
         ];
         this.ordens.set(todasOrdens);

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
@@ -43,6 +43,7 @@ export class AgendamentosListaComponent implements OnInit {
   
   searchTerm = '';
   filtroStatus = signal<StatusAgendamento | 'TODOS'>('TODOS');
+  dropdownAbertoId = signal<number | null>(null);
   
   statusOptions = [
     { value: 'TODOS' as const, label: 'Todos', class: 'secondary' },
@@ -50,6 +51,14 @@ export class AgendamentosListaComponent implements OnInit {
     { value: StatusAgendamento.EM_ANDAMENTO, label: 'Em Andamento', class: 'warning' },
     { value: StatusAgendamento.CONCLUIDO, label: 'Concluído', class: 'success' },
     { value: StatusAgendamento.CANCELADO, label: 'Cancelado', class: 'danger' }
+  ];
+  
+  // ✅ Opções do dropdown de status
+  statusDropdownOptions = [
+    { value: StatusAgendamento.AGENDADO, label: 'Agendado', class: 'primary', icon: 'calendar-check' },
+    { value: StatusAgendamento.EM_ANDAMENTO, label: 'Em Andamento', class: 'warning', icon: 'play-circle' },
+    { value: StatusAgendamento.CONCLUIDO, label: 'Concluído', class: 'success', icon: 'check-circle' },
+    { value: StatusAgendamento.CANCELADO, label: 'Cancelado', class: 'danger', icon: 'x-circle' }
   ];
   
   ngOnInit(): void {
@@ -63,12 +72,21 @@ export class AgendamentosListaComponent implements OnInit {
     }
   }
   
+  // ✅ Listener global para fechar dropdown ao clicar fora
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.status-dropdown-container')) {
+      this.dropdownAbertoId.set(null);
+    }
+  }
+  
   inicializarForm(): void {
     this.agendamentoForm = this.fb.group({
       cdCliente: ['', [Validators.required]],
       cdVeiculo: ['', [Validators.required]],
       cdMecanico: ['', [Validators.required]],
-      dataAgendamento: ['', [Validators.required]], // ✅ APENAS DATA
+      dataAgendamento: ['', [Validators.required]],
       observacoes: ['', [Validators.maxLength(1000)]]
     });
     
@@ -98,9 +116,14 @@ export class AgendamentosListaComponent implements OnInit {
   
   carregarAgendamentos(): Promise<void> {
     return new Promise((resolve) => {
-      this.agendamentoService.listarFuturos().subscribe({
+      // ✅ CORRIGIDO: Listar TODOS os agendamentos (incluindo os criados automaticamente pelas OS)
+      this.agendamentoService.listarTodos().subscribe({
         next: (agendamentos) => {
-          this.agendamentos.set(agendamentos);
+          // Ordenar por data (mais recentes primeiro)
+          const agendamentosOrdenados = agendamentos.sort((a, b) => {
+            return new Date(b.dataAgendamento).getTime() - new Date(a.dataAgendamento).getTime();
+          });
+          this.agendamentos.set(agendamentosOrdenados);
           this.aplicarFiltro();
           resolve();
         },
@@ -188,14 +211,82 @@ export class AgendamentosListaComponent implements OnInit {
     this.aplicarFiltro();
   }
   
+  // ==================== DROPDOWN DE STATUS ====================
+  
+  toggleDropdownStatus(agendamentoId: number, event: Event): void {
+    event.stopPropagation();
+    
+    if (this.dropdownAbertoId() === agendamentoId) {
+      this.dropdownAbertoId.set(null);
+    } else {
+      this.dropdownAbertoId.set(agendamentoId);
+      
+      // ✅ Posicionar dropdown corretamente com position: fixed
+      setTimeout(() => {
+        const target = event.target as HTMLElement;
+        const badge = target.closest('.status-clickable') as HTMLElement;
+        const dropdown = target.closest('.status-dropdown-container')?.querySelector('.status-dropdown-menu') as HTMLElement;
+        
+        if (badge && dropdown) {
+          const rect = badge.getBoundingClientRect();
+          dropdown.style.top = `${rect.bottom + 4}px`;
+          dropdown.style.left = `${rect.left}px`;
+        }
+      }, 0);
+    }
+  }
+  
+  isDropdownAberto(agendamentoId: number): boolean {
+    return this.dropdownAbertoId() === agendamentoId;
+  }
+  
+  // ✅ Mudar status do agendamento (sincroniza com OS automaticamente)
+  mudarStatus(agendamento: Agendamento, novoStatus: StatusAgendamento, event: Event): void {
+    event.stopPropagation();
+    this.dropdownAbertoId.set(null);
+    
+    // Se já está no mesmo status, não faz nada
+    if (agendamento.status === novoStatus) {
+      return;
+    }
+    
+    // Confirmação para mudanças críticas
+    const mensagens: Record<StatusAgendamento, string> = {
+      [StatusAgendamento.AGENDADO]: 'Deseja voltar este agendamento para AGENDADO?',
+      [StatusAgendamento.EM_ANDAMENTO]: 'Deseja iniciar este agendamento? A Ordem de Serviço será atualizada automaticamente.',
+      [StatusAgendamento.CONCLUIDO]: 'Deseja concluir este agendamento? A Ordem de Serviço será atualizada automaticamente.',
+      [StatusAgendamento.CANCELADO]: 'Deseja cancelar este agendamento? A Ordem de Serviço será atualizada automaticamente.'
+    };
+    
+    if (!confirm(mensagens[novoStatus])) {
+      return;
+    }
+    
+    this.isLoading.set(true);
+    
+    this.agendamentoService.atualizarStatus(agendamento.cdAgendamento, novoStatus).subscribe({
+      next: () => {
+        this.carregarAgendamentos();
+        alert('✅ Status atualizado com sucesso! A Ordem de Serviço foi sincronizada automaticamente.');
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar status:', error);
+        this.isLoading.set(false);
+        alert('❌ ' + (error.error?.message || 'Erro ao atualizar status do agendamento'));
+      }
+    });
+  }
+  
+  // ==================== MODAL ====================
+  
   abrirModalNovo(): void {
     this.modoEdicao.set(false);
     this.agendamentoEditando.set(null);
     this.agendamentoForm.reset();
     
-    // ✅ Data padrão: hoje
+    // Data padrão: hoje
     const hoje = new Date();
-    const dataFormatada = hoje.toISOString().split('T')[0]; // "2025-01-20"
+    const dataFormatada = hoje.toISOString().split('T')[0];
     this.agendamentoForm.patchValue({
       dataAgendamento: dataFormatada
     });
@@ -211,7 +302,7 @@ export class AgendamentosListaComponent implements OnInit {
       cdCliente: agendamento.cdCliente,
       cdVeiculo: agendamento.cdVeiculo,
       cdMecanico: agendamento.cdMecanico,
-      dataAgendamento: agendamento.dataAgendamento, // ✅ Já vem no formato correto "2025-01-20"
+      dataAgendamento: agendamento.dataAgendamento,
       observacoes: agendamento.observacoes || ''
     });
     
@@ -243,7 +334,7 @@ export class AgendamentosListaComponent implements OnInit {
       cdCliente: formValue.cdCliente,
       cdVeiculo: formValue.cdVeiculo,
       cdMecanico: formValue.cdMecanico,
-      dataAgendamento: formValue.dataAgendamento, // ✅ Já está no formato "2025-01-20"
+      dataAgendamento: formValue.dataAgendamento,
       observacoes: formValue.observacoes || undefined,
       status: StatusAgendamento.AGENDADO
     };
@@ -282,6 +373,8 @@ export class AgendamentosListaComponent implements OnInit {
     }
   }
   
+  // ==================== UTILS ====================
+  
   getStatusLabel(status: StatusAgendamento): string {
     const statusObj = this.statusOptions.find(s => s.value === status);
     return statusObj?.label || status;
@@ -315,7 +408,6 @@ export class AgendamentosListaComponent implements OnInit {
     });
   }
   
-  // ✅ FUNÇÃO CORRIGIDA: Apenas data
   formatarData(data: string): string {
     return formatarDataSimples(data);
   }

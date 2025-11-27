@@ -32,6 +32,11 @@ export class AgendamentoService {
     return this.http.get<Agendamento[]>(`${this.apiUrl}/futuros`);
   }
   
+  // ✅ NOVO: Listar TODOS os agendamentos (incluindo os criados automaticamente pelas OS)
+  listarTodos(): Observable<Agendamento[]> {
+    return this.http.get<Agendamento[]>(this.apiUrl);
+  }
+  
   // Atualizar agendamento
   atualizar(id: number, data: AgendamentoRequest): Observable<Agendamento> {
     return this.http.put<Agendamento>(`${this.apiUrl}/${id}`, data);

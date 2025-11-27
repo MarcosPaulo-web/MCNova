@@ -66,7 +66,7 @@
   } @else {
   <!-- Tabela de Agendamentos -->
   <div class="card">
-    <div class="card-body p-0">
+    <div class="card-body">
       @if (agendamentosFiltrados().length === 0) {
       <div class="empty-state">
         <i class="bi bi-inbox"></i>
@@ -77,20 +77,19 @@
         <table class="table table-hover mb-0">
           <thead>
             <tr>
-              <th>Data</th>
-              <th>Cliente</th>
-              <th>Veículo</th>
-              <th>Mecânico</th>
-              <th>Observações</th>
-              <th>Status</th>
-              <th class="text-center">Ações</th>
+              <th>DATA</th>
+              <th>CLIENTE</th>
+              <th>VEÍCULO</th>
+              <th>MECÂNICO</th>
+              <th>OBSERVAÇÕES</th>
+              <th>STATUS</th>
+              <th class="text-center">AÇÕES</th>
             </tr>
           </thead>
           <tbody>
             @for (agendamento of agendamentosFiltrados(); track
             agendamento.cdAgendamento) {
             <tr>
-              <!-- ✅ CORRIGIDO: Apenas data -->
               <td>
                 <strong>{{ formatarData(agendamento.dataAgendamento) }}</strong>
               </td>
@@ -102,13 +101,38 @@
               <td>
                 <small>{{ agendamento.observacoes || "-" }}</small>
               </td>
+              <!-- ✅ DROPDOWN DE STATUS CLICÁVEL -->
               <td>
-                <span
-                  class="badge"
-                  [ngClass]="getStatusClass(agendamento.status)"
-                >
-                  {{ getStatusLabel(agendamento.status) }}
-                </span>
+                <div class="status-dropdown-container">
+                  <span 
+                    class="badge status-clickable" 
+                    [ngClass]="getStatusClass(agendamento.status)"
+                    (click)="toggleDropdownStatus(agendamento.cdAgendamento, $event)"
+                    title="Clique para alterar o status"
+                  >
+                    {{ getStatusLabel(agendamento.status) }}
+                    <i class="bi bi-chevron-down ms-1"></i>
+                  </span>
+                  
+                  <!-- Dropdown Menu -->
+                  @if (isDropdownAberto(agendamento.cdAgendamento)) {
+                    <div class="status-dropdown-menu">
+                      @for (statusOpt of statusDropdownOptions; track statusOpt.value) {
+                        <div 
+                          class="status-dropdown-item"
+                          [class.active]="agendamento.status === statusOpt.value"
+                          (click)="mudarStatus(agendamento, statusOpt.value, $event)"
+                        >
+                          <i class="bi bi-{{ statusOpt.icon }} me-2" [class]="'text-' + statusOpt.class"></i>
+                          <span>{{ statusOpt.label }}</span>
+                          @if (agendamento.status === statusOpt.value) {
+                            <i class="bi bi-check2 ms-auto text-success"></i>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
               </td>
               <td class="text-center">
                 <div class="btn-group btn-group-sm">
@@ -234,7 +258,7 @@
               }
             </div>
 
-            <!-- ✅ CORRIGIDO: Apenas Data (sem hora) -->
+            <!-- Data -->
             <div class="col-md-12">
               <label for="dataAgendamento" class="form-label">
                 Data do Agendamento <span class="text-danger">*</span>
