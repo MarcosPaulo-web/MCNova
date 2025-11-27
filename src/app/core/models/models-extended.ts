@@ -61,19 +61,24 @@ export interface AgendamentoRequest {
   cdCliente: number;
   cdVeiculo: number;
   cdMecanico: number;
-  dataAgendamento: string; // ✅ Formato: "2025-01-20"
+  dataAgendamento: string;
   observacoes?: string;
   status?: StatusAgendamento;
 }
 
 // ==================== ORDEM DE SERVICO ====================
+// ✅ CORRIGIDO: Interface atualizada para corresponder ao backend
 export interface OrdemServico {
   cdOrdemServico: number;
-  cliente?: { cdCliente: number; nmCliente: string };
-  veiculo?: { cdVeiculo: number; placa: string; modelo: string };
-  mecanico?: { cdUsuario: number; nmUsuario: string };
+  cdCliente?: number; // Backend retorna direto
+  nmCliente?: string; // Backend retorna direto
+  cdVeiculo?: number; // Backend retorna direto
+  placa?: string; // Backend retorna direto
+  modeloVeiculo?: string; // Backend retorna direto
+  cdMecanico?: number; // Backend retorna direto
+  nmMecanico?: string; // Backend retorna direto
   tipoServico: TipoServico;
-  status: StatusOrdemServico; // Mapeia para statusOrdemServico do backend
+  statusOrdemServico: StatusOrdemServico; // ✅ NOME CORRETO DO BACKEND
   dataAbertura: string;
   dataFechamento?: string;
   vlPecas: number;
@@ -89,9 +94,9 @@ export interface OrdemServico {
 export interface OrdemServicoRequest {
   cdCliente: number;
   cdVeiculo: number;
-  cdMecanico: number; // ✅ Agora obrigatório
+  cdMecanico: number;
   tipoServico: TipoServico;
-  dataAgendamento?: string; // ✅ NOVO CAMPO (formato: "2025-01-20")
+  dataAgendamento?: string;
   vlMaoObra?: number;
   desconto?: number;
   observacoes?: string;

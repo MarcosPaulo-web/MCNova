@@ -32,9 +32,26 @@ export class OrdemServicoService {
     return this.http.get<OrdemServico[]>(`${this.apiUrl}/orcamentos/pendentes`);
   }
   
-  // ✅ ATUALIZADO: Aprovar orcamento com data de agendamento
+  // Aprovar orcamento com data de agendamento
   aprovarOrcamento(id: number, dataAgendamento?: string): Observable<OrdemServico> {
     return this.http.patch<OrdemServico>(`${this.apiUrl}/${id}/aprovar-orcamento`, { dataAgendamento });
+  }
+  
+  // ✅ NOVO: Atualizar ordem de servico
+  atualizar(id: number, data: OrdemServicoRequest): Observable<OrdemServico> {
+    return this.http.put<OrdemServico>(`${this.apiUrl}/${id}`, data);
+  }
+  
+  // ✅ NOVO: Alterar status diretamente
+  alterarStatus(id: number, novoStatus: StatusOrdemServico): Observable<OrdemServico> {
+    return this.http.patch<OrdemServico>(`${this.apiUrl}/${id}/alterar-status`, { 
+      novoStatus: novoStatus 
+    });
+  }
+  
+  // ✅ NOVO: Iniciar ordem de servico
+  iniciar(id: number): Observable<OrdemServico> {
+    return this.http.patch<OrdemServico>(`${this.apiUrl}/${id}/iniciar`, {});
   }
   
   // Concluir ordem de servico

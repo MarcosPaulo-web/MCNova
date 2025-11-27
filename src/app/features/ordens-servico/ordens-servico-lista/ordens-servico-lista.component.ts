@@ -9,7 +9,6 @@ import { ServicoService } from '../../../core/services/servico.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { OrdemServico, OrdemServicoRequest, ItemOrdemServicoRequest, Cliente, Veiculo, Produto, Servico, Usuario, StatusOrdemServico, TipoServico, FormaPagamento } from '../../../core/models';
-import { formatarData } from '../../../core/utils/formatters.util';
 
 declare var bootstrap: any;
 
@@ -41,8 +40,10 @@ export class OrdensServicoListaComponent implements OnInit {
   
   @ViewChild('ordemModal') modalElement!: ElementRef;
   @ViewChild('aprovarModal') aprovarModalElement!: ElementRef;
+  @ViewChild('editarModal') editarModalElement!: ElementRef;
   private modalInstance: any;
   public aprovarModalInstance: any;
+  public editarModalInstance: any;
   
   ordens = signal<OrdemServico[]>([]);
   ordensFiltradas = signal<OrdemServico[]>([]);
@@ -58,6 +59,7 @@ export class OrdensServicoListaComponent implements OnInit {
   
   ordemForm!: FormGroup;
   aprovarForm!: FormGroup;
+  editarForm!: FormGroup;
   itens = signal<ItemLocal[]>([]);
   
   produtoSelecionado = signal<number | null>(null);
@@ -65,6 +67,10 @@ export class OrdensServicoListaComponent implements OnInit {
   servicoSelecionado = signal<number | null>(null);
   
   ordemParaAprovar = signal<OrdemServico | null>(null);
+  ordemParaEditar = signal<OrdemServico | null>(null);
+  
+  // ✅ NOVO: Controle do dropdown de status
+  dropdownAbertoId = signal<number | null>(null);
   
   filtroStatus = signal<StatusOrdemServico | 'TODOS'>('TODOS');
   
@@ -74,6 +80,14 @@ export class OrdensServicoListaComponent implements OnInit {
     { value: StatusOrdemServico.EM_ANDAMENTO, label: 'Em Andamento', class: 'primary' },
     { value: StatusOrdemServico.CONCLUIDA, label: 'Concluída', class: 'success' },
     { value: StatusOrdemServico.CANCELADA, label: 'Cancelada', class: 'danger' }
+  ];
+  
+  // ✅ NOVO: Opções de status para o dropdown (sem "TODOS")
+  statusDropdownOptions = [
+    { value: StatusOrdemServico.AGUARDANDO, label: 'Aguardando', class: 'warning', icon: 'clock' },
+    { value: StatusOrdemServico.EM_ANDAMENTO, label: 'Em Andamento', class: 'primary', icon: 'play-circle' },
+    { value: StatusOrdemServico.CONCLUIDA, label: 'Concluída', class: 'success', icon: 'check-circle' },
+    { value: StatusOrdemServico.CANCELADA, label: 'Cancelada', class: 'danger', icon: 'x-circle' }
   ];
   
   tiposServico = [
@@ -91,6 +105,14 @@ export class OrdensServicoListaComponent implements OnInit {
   ngOnInit(): void {
     this.inicializarForms();
     this.carregarDados();
+    
+    // ✅ NOVO: Fechar dropdown ao clicar fora
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.status-dropdown-container')) {
+        this.dropdownAbertoId.set(null);
+      }
+    });
   }
   
   ngAfterViewInit(): void {
@@ -100,26 +122,32 @@ export class OrdensServicoListaComponent implements OnInit {
     if (this.aprovarModalElement) {
       this.aprovarModalInstance = new bootstrap.Modal(this.aprovarModalElement.nativeElement);
     }
+    if (this.editarModalElement) {
+      this.editarModalInstance = new bootstrap.Modal(this.editarModalElement.nativeElement);
+    }
   }
   
   inicializarForms(): void {
-    // Form principal de ordem/orçamento
     this.ordemForm = this.fb.group({
       cdCliente: ['', [Validators.required]],
       cdVeiculo: ['', [Validators.required]],
       cdMecanico: ['', [Validators.required]],
       tipoServico: [TipoServico.ORDEM_DE_SERVICO, [Validators.required]],
-      dataAgendamento: [''], // ✅ Opcional inicialmente
+      dataAgendamento: [''],
       observacoes: [''],
       diagnostico: ['']
     });
     
-    // ✅ Form para aprovação de orçamento
     this.aprovarForm = this.fb.group({
       dataAgendamento: ['', [Validators.required]]
     });
     
-    // Listener para carregar veículos quando selecionar cliente
+    this.editarForm = this.fb.group({
+      observacoes: [''],
+      diagnostico: [''],
+      novoStatus: ['']
+    });
+    
     this.ordemForm.get('cdCliente')?.valueChanges.subscribe(cdCliente => {
       if (cdCliente) {
         this.carregarVeiculosCliente(cdCliente);
@@ -128,7 +156,6 @@ export class OrdensServicoListaComponent implements OnInit {
       }
     });
     
-    // ✅ Listener para tipo de serviço (OS exige data, orçamento não)
     this.ordemForm.get('tipoServico')?.valueChanges.subscribe(tipo => {
       const dataControl = this.ordemForm.get('dataAgendamento');
       
@@ -158,7 +185,6 @@ export class OrdensServicoListaComponent implements OnInit {
   
   carregarOrdens(): Promise<void> {
     return new Promise((resolve) => {
-      // Carrega todas as ordens (não concluídas/canceladas)
       this.ordemServicoService.listarPorStatus(StatusOrdemServico.AGUARDANDO).subscribe({
         next: (ordensAguardando) => {
           this.ordemServicoService.listarPorStatus(StatusOrdemServico.EM_ANDAMENTO).subscribe({
@@ -242,7 +268,7 @@ export class OrdensServicoListaComponent implements OnInit {
     let filtradas = this.ordens();
     
     if (this.filtroStatus() !== 'TODOS') {
-      filtradas = filtradas.filter(o => o.status === this.filtroStatus());
+      filtradas = filtradas.filter(o => o.statusOrdemServico === this.filtroStatus());
     }
     
     this.ordensFiltradas.set(filtradas);
@@ -253,12 +279,66 @@ export class OrdensServicoListaComponent implements OnInit {
     this.aplicarFiltro();
   }
   
+  // ✅ NOVO: Toggle do dropdown de status
+  toggleDropdownStatus(ordemId: number, event: Event): void {
+    event.stopPropagation();
+    
+    if (this.dropdownAbertoId() === ordemId) {
+      this.dropdownAbertoId.set(null);
+    } else {
+      this.dropdownAbertoId.set(ordemId);
+    }
+  }
+  
+  // ✅ NOVO: Verificar se dropdown está aberto
+  isDropdownAberto(ordemId: number): boolean {
+    return this.dropdownAbertoId() === ordemId;
+  }
+  
+  // ✅ NOVO: Mudar status da ordem
+  mudarStatus(ordem: OrdemServico, novoStatus: StatusOrdemServico, event: Event): void {
+    event.stopPropagation();
+    
+    // Fechar dropdown
+    this.dropdownAbertoId.set(null);
+    
+    // Se o status não mudou, não faz nada
+    if (ordem.statusOrdemServico === novoStatus) {
+      return;
+    }
+    
+    // Se mudou para CONCLUIDA, precisa de forma de pagamento
+    if (novoStatus === StatusOrdemServico.CONCLUIDA) {
+      this.concluirOrdem(ordem);
+      return;
+    }
+    
+    // Confirmar mudança
+    const statusAtual = this.getStatusLabel(ordem.statusOrdemServico);
+    const novoStatusLabel = this.getStatusLabel(novoStatus);
+    
+    if (!confirm(`Deseja alterar o status de "${statusAtual}" para "${novoStatusLabel}"?`)) {
+      return;
+    }
+    
+    // Chamar o service
+    this.ordemServicoService.alterarStatus(ordem.cdOrdemServico, novoStatus).subscribe({
+      next: () => {
+        this.carregarOrdens();
+        alert(`Status alterado para "${novoStatusLabel}" com sucesso!`);
+      },
+      error: (error) => {
+        console.error('Erro ao alterar status:', error);
+        alert(error.error?.message || 'Erro ao alterar status');
+      }
+    });
+  }
+  
   abrirModalNovo(): void {
     this.ordemForm.reset({
       tipoServico: TipoServico.ORDEM_DE_SERVICO
     });
     
-    // ✅ Data padrão: hoje (se for OS)
     const hoje = new Date().toISOString().split('T')[0];
     this.ordemForm.patchValue({
       dataAgendamento: hoje
@@ -387,7 +467,7 @@ export class OrdensServicoListaComponent implements OnInit {
       cdVeiculo: formValue.cdVeiculo,
       cdMecanico: formValue.cdMecanico,
       tipoServico: formValue.tipoServico,
-      dataAgendamento: formValue.dataAgendamento || undefined, // ✅ Envia data se preenchida
+      dataAgendamento: formValue.dataAgendamento || undefined,
       observacoes: formValue.observacoes || undefined,
       diagnostico: formValue.diagnostico || undefined,
       itens: itensRequest
@@ -408,11 +488,9 @@ export class OrdensServicoListaComponent implements OnInit {
     });
   }
   
-  // ✅ NOVO: Abrir modal de aprovação
   abrirModalAprovar(ordem: OrdemServico): void {
     this.ordemParaAprovar.set(ordem);
     
-    // Data padrão: hoje
     const hoje = new Date().toISOString().split('T')[0];
     this.aprovarForm.patchValue({
       dataAgendamento: hoje
@@ -421,7 +499,6 @@ export class OrdensServicoListaComponent implements OnInit {
     this.aprovarModalInstance?.show();
   }
   
-  // ✅ ATUALIZADO: Aprovar orçamento com data
   aprovarOrcamento(): void {
     if (this.aprovarForm.invalid) {
       alert('Informe a data de agendamento');
@@ -446,6 +523,51 @@ export class OrdensServicoListaComponent implements OnInit {
         console.error('Erro ao aprovar:', error);
         this.isSubmitting.set(false);
         alert(error.error?.message || 'Erro ao aprovar orçamento');
+      }
+    });
+  }
+  
+  abrirModalEditar(ordem: OrdemServico): void {
+    this.ordemParaEditar.set(ordem);
+    
+    this.editarForm.patchValue({
+      observacoes: ordem.observacoes || '',
+      diagnostico: ordem.diagnostico || '',
+      novoStatus: ordem.statusOrdemServico
+    });
+    
+    this.editarModalInstance?.show();
+  }
+  
+  salvarEdicao(): void {
+    const ordem = this.ordemParaEditar();
+    if (!ordem) return;
+    
+    this.isSubmitting.set(true);
+    
+    const formValue = this.editarForm.value;
+    
+    const dados: OrdemServicoRequest = {
+      cdCliente: ordem.cdCliente!,
+      cdVeiculo: ordem.cdVeiculo!,
+      cdMecanico: ordem.cdMecanico!,
+      tipoServico: ordem.tipoServico,
+      observacoes: formValue.observacoes || undefined,
+      diagnostico: formValue.diagnostico || undefined,
+      itens: []
+    };
+    
+    this.ordemServicoService.atualizar(ordem.cdOrdemServico, dados).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.editarModalInstance?.hide();
+        this.carregarOrdens();
+        alert('Ordem atualizada com sucesso!');
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar:', error);
+        this.isSubmitting.set(false);
+        alert(error.error?.message || 'Erro ao atualizar ordem');
       }
     });
   }
@@ -518,7 +640,38 @@ export class OrdensServicoListaComponent implements OnInit {
     return tipoObj?.label || tipo;
   }
   
-  formatarDataHora(data: string): string {
-    return formatarData(data);
+  formatarDataHora(dataISO: string): string {
+    if (!dataISO) return '-';
+    
+    try {
+      const data = new Date(dataISO);
+      
+      if (isNaN(data.getTime())) return '-';
+      
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const ano = data.getFullYear();
+      const hora = String(data.getHours()).padStart(2, '0');
+      const min = String(data.getMinutes()).padStart(2, '0');
+      
+      return `${dia}/${mes}/${ano} ${hora}:${min}`;
+    } catch {
+      return '-';
+    }
+  }
+  
+  getClienteNome(ordem: OrdemServico): string {
+    return ordem.nmCliente || '-';
+  }
+  
+  getVeiculoInfo(ordem: OrdemServico): string {
+    if (ordem.placa && ordem.modeloVeiculo) {
+      return `${ordem.placa} - ${ordem.modeloVeiculo}`;
+    } else if (ordem.placa) {
+      return ordem.placa;
+    } else if (ordem.modeloVeiculo) {
+      return ordem.modeloVeiculo;
+    }
+    return '-';
   }
 }

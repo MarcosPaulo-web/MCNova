@@ -56,13 +56,13 @@
             <table class="table table-hover mb-0">
               <thead>
                 <tr>
-                  <th>Data</th>
-                  <th>Cliente</th>
-                  <th>Veículo</th>
-                  <th>Tipo</th>
-                  <th>Status</th>
-                  <th>Total</th>
-                  <th class="text-center">Ações</th>
+                  <th>DATA</th>
+                  <th>CLIENTE</th>
+                  <th>VEÍCULO</th>
+                  <th>TIPO</th>
+                  <th>STATUS</th>
+                  <th>TOTAL</th>
+                  <th class="text-center">AÇÕES</th>
                 </tr>
               </thead>
               <tbody>
@@ -71,30 +71,70 @@
                     <td>
                       <small>{{ formatarDataHora(ordem.dataAbertura) }}</small>
                     </td>
-                    <td>{{ ordem.cliente?.nmCliente || '-' }}</td>
+                    <td>{{ getClienteNome(ordem) }}</td>
                     <td>
-                      <span class="placa">{{ ordem.veiculo?.placa || '-' }}</span>
+                      <span class="placa">{{ ordem.placa || '-' }}</span>
                       <br>
-                      <small class="text-muted">{{ ordem.veiculo?.modelo || '-' }}</small>
+                      <small class="text-muted">{{ ordem.modeloVeiculo || '-' }}</small>
                     </td>
                     <td>
                       @if (ordem.tipoServico === 'ORCAMENTO') {
-                        <span class="badge bg-info">Orçamento</span>
+                        <span class="badge bg-info">OS</span>
                       } @else {
                         <span class="badge bg-primary">OS</span>
                       }
                     </td>
+                    <!-- ✅ NOVO: Dropdown de Status Clicável -->
                     <td>
-                      <span class="badge" [ngClass]="getStatusClass(ordem.status)">
-                        {{ getStatusLabel(ordem.status) }}
-                      </span>
+                      <div class="status-dropdown-container">
+                        <span 
+                          class="badge status-clickable" 
+                          [ngClass]="getStatusClass(ordem.statusOrdemServico)"
+                          (click)="toggleDropdownStatus(ordem.cdOrdemServico, $event)"
+                          title="Clique para alterar o status"
+                        >
+                          {{ getStatusLabel(ordem.statusOrdemServico) }}
+                          <i class="bi bi-chevron-down ms-1"></i>
+                        </span>
+                        
+                        <!-- Dropdown Menu -->
+                        @if (isDropdownAberto(ordem.cdOrdemServico)) {
+                          <div class="status-dropdown-menu">
+                            @for (statusOpt of statusDropdownOptions; track statusOpt.value) {
+                              <div 
+                                class="status-dropdown-item"
+                                [class.active]="ordem.statusOrdemServico === statusOpt.value"
+                                (click)="mudarStatus(ordem, statusOpt.value, $event)"
+                              >
+                                <i class="bi bi-{{ statusOpt.icon }} me-2" [class]="'text-' + statusOpt.class"></i>
+                                <span>{{ statusOpt.label }}</span>
+                                @if (ordem.statusOrdemServico === statusOpt.value) {
+                                  <i class="bi bi-check2 ms-auto text-success"></i>
+                                }
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
                     </td>
                     <td>
                       <strong class="text-success">{{ formatarMoeda(ordem.vlTotal) }}</strong>
                     </td>
                     <td class="text-center">
                       <div class="btn-group btn-group-sm">
-                        @if (ordem.tipoServico === 'ORCAMENTO' && ordem.status === 'AGUARDANDO') {
+                        <!-- Editar -->
+                        @if (ordem.statusOrdemServico === 'AGUARDANDO') {
+                          <button
+                            class="btn btn-outline-info"
+                            (click)="abrirModalEditar(ordem)"
+                            title="Editar"
+                          >
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                        }
+                        
+                        <!-- Aprovar Orçamento -->
+                        @if (ordem.tipoServico === 'ORCAMENTO' && ordem.statusOrdemServico === 'AGUARDANDO') {
                           <button
                             class="btn btn-outline-success"
                             (click)="abrirModalAprovar(ordem)"
@@ -104,17 +144,8 @@
                           </button>
                         }
                         
-                        @if (ordem.status === 'EM_ANDAMENTO') {
-                          <button
-                            class="btn btn-outline-success"
-                            (click)="concluirOrdem(ordem)"
-                            title="Concluir"
-                          >
-                            <i class="bi bi-check2-all"></i>
-                          </button>
-                        }
-                        
-                        @if (ordem.status !== 'CONCLUIDA' && ordem.status !== 'CANCELADA') {
+                        <!-- Cancelar -->
+                        @if (ordem.statusOrdemServico !== 'CONCLUIDA' && ordem.statusOrdemServico !== 'CANCELADA') {
                           <button
                             class="btn btn-outline-danger"
                             (click)="cancelarOrdem(ordem)"
@@ -143,7 +174,7 @@
   }
 </div>
 
-<!-- Modal de Ordem -->
+<!-- Modal de Criar Ordem -->
 <div class="modal fade" #ordemModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
@@ -158,7 +189,6 @@
       <form [formGroup]="ordemForm" (ngSubmit)="salvar()">
         <div class="modal-body">
           <div class="row g-3">
-            <!-- Informações Básicas -->
             <div class="col-12">
               <h6 class="section-title">
                 <i class="bi bi-info-circle me-2"></i>
@@ -245,11 +275,6 @@
                 id="dataAgendamento"
                 formControlName="dataAgendamento"
               />
-              @if (ordemForm.get('tipoServico')?.value === 'ORCAMENTO') {
-                <small class="form-text text-muted">
-                  Não é necessário para orçamentos
-                </small>
-              }
             </div>
             
             <!-- Produtos -->
@@ -446,7 +471,7 @@
   </div>
 </div>
 
-<!-- Modal de Aprovação de Orçamento -->
+<!-- Modal de Aprovação -->
 <div class="modal fade" #aprovarModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -474,15 +499,12 @@
               id="dataAgendamentoAprovar"
               formControlName="dataAgendamento"
             />
-            <small class="form-text text-muted">
-              Um agendamento será criado automaticamente para o mecânico nesta data
-            </small>
           </div>
           
           @if (ordemParaAprovar()) {
             <div class="alert alert-info">
-              <strong>Cliente:</strong> {{ ordemParaAprovar()?.cliente?.nmCliente }}<br>
-              <strong>Veículo:</strong> {{ ordemParaAprovar()?.veiculo?.placa }}<br>
+              <strong>Cliente:</strong> {{ ordemParaAprovar()?.nmCliente }}<br>
+              <strong>Veículo:</strong> {{ ordemParaAprovar()?.placa }}<br>
               <strong>Total:</strong> {{ formatarMoeda(ordemParaAprovar()!.vlTotal) }}
             </div>
           }
@@ -508,6 +530,78 @@
             } @else {
               <i class="bi bi-check-circle me-2"></i>
               Aprovar Orçamento
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Edição -->
+<div class="modal fade" #editarModal tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-pencil me-2"></i>
+          Editar Ordem de Serviço
+        </h5>
+        <button type="button" class="btn-close" (click)="editarModalInstance?.hide()"></button>
+      </div>
+      
+      <form [formGroup]="editarForm" (ngSubmit)="salvarEdicao()">
+        <div class="modal-body">
+          @if (ordemParaEditar()) {
+            <div class="alert alert-info mb-3">
+              <strong>OS #{{ ordemParaEditar()?.cdOrdemServico }}</strong><br>
+              <strong>Cliente:</strong> {{ ordemParaEditar()?.nmCliente }}<br>
+              <strong>Veículo:</strong> {{ ordemParaEditar()?.placa }}<br>
+              <strong>Status:</strong> {{ getStatusLabel(ordemParaEditar()!.statusOrdemServico) }}
+            </div>
+          }
+          
+          <div class="mb-3">
+            <label for="editObservacoes" class="form-label">Observações</label>
+            <textarea
+              class="form-control"
+              id="editObservacoes"
+              formControlName="observacoes"
+              rows="3"
+            ></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label for="editDiagnostico" class="form-label">Diagnóstico</label>
+            <textarea
+              class="form-control"
+              id="editDiagnostico"
+              formControlName="diagnostico"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="editarModalInstance?.hide()"
+            [disabled]="isSubmitting()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Salvando...
+            } @else {
+              <i class="bi bi-check-circle me-2"></i>
+              Salvar
             }
           </button>
         </div>
