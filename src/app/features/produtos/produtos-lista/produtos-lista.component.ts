@@ -101,7 +101,7 @@ export class ProdutosListaComponent implements OnInit {
       categoria: this.produtoForm.value.categoria || undefined,
       vlProduto: this.produtoForm.value.vlProduto,  // ✅ ÚNICO VALOR
       qtdEstoque: this.produtoForm.value.qtdEstoque,
-      qtdMinimo: this.produtoForm.value.qtdMinimo  // ✅ CORRIGIDO
+      qtdMinimoEstoque: this.produtoForm.value.qtdMinimo  // ✅ CORRIGIDO
     };
     
     const operacao = this.modoEdicao && this.produtoEditando
