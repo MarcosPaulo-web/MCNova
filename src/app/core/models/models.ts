@@ -1,6 +1,5 @@
 import { UserRole, AuthProvider } from './enums';
 
-
 export interface Usuario {
   cdUsuario: number;
   nmUsuario: string;
@@ -17,7 +16,7 @@ export interface UsuarioRequest {
   email: string;
   senha?: string;
   provider?: AuthProvider;
-  authProvider?: AuthProvider; 
+  authProvider?: AuthProvider;
   roles: UserRole[];
   telefone?: string;
   cpf?: string;
@@ -25,10 +24,9 @@ export interface UsuarioRequest {
   ativo?: boolean;
 }
 
-
 export interface LoginRequest {
   email: string;
-  senha: string;
+  password: string;
 }
 
 export interface AuthResponse {
@@ -36,7 +34,6 @@ export interface AuthResponse {
   tokenType: string;
   usuario: Usuario;
 }
-
 
 export interface Cliente {
   cdCliente: number;
@@ -56,7 +53,6 @@ export interface ClienteRequest {
   endereco?: string;
 }
 
-
 export interface Veiculo {
   cdVeiculo: number;
   cdCliente: number;
@@ -65,7 +61,7 @@ export interface Veiculo {
   marca?: string;
   ano?: number;
   cor?: string;
-  cliente?: {  
+  cliente?: {
     cdCliente: number;
     nmCliente: string;
   };
