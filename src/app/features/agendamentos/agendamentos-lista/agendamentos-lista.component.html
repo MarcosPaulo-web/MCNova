@@ -18,7 +18,6 @@
   <div class="filters-bar card">
     <div class="card-body">
       <div class="row g-3">
-        <!-- Busca -->
         <div class="col-md-12">
           <div class="input-group">
             <span class="input-group-text">
@@ -62,7 +61,6 @@
     <p class="text-muted mt-2">Carregando agendamentos...</p>
   </div>
   } @else {
-  <!-- Tabela de Agendamentos -->
   <div class="card">
     <div class="card-body">
       @if (agendamentosFiltrados().length === 0) {
@@ -186,7 +184,6 @@
   }
 </div>
 
-<!-- Modal de Agendamento -->
 <div class="modal fade" #agendamentoModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -210,7 +207,7 @@
           <div class="row g-3">
             <!-- Cliente -->
             <div class="col-md-12">
-              <label for="cdCliente" class="form-label">
+              <label for="cdCliente" class="form-label text-body">
                 Cliente <span class="text-danger">*</span>
               </label>
               <select
@@ -235,7 +232,7 @@
 
             <!-- Veículo -->
             <div class="col-md-12">
-              <label for="cdVeiculo" class="form-label">
+              <label for="cdVeiculo" class="form-label text-body">
                 Veículo <span class="text-danger">*</span>
               </label>
               <select
@@ -265,7 +262,7 @@
 
             <!-- Data -->
             <div class="col-md-12">
-              <label for="dataAgendamento" class="form-label">
+              <label for="dataAgendamento" class="form-label text-body">
                 Data do Agendamento <span class="text-danger">*</span>
               </label>
               <input
@@ -284,7 +281,7 @@
 
             <!-- Mecânico -->
             <div class="col-md-12">
-              <label for="cdMecanico" class="form-label">
+              <label for="cdMecanico" class="form-label text-body">
                 Mecânico Responsável <span class="text-danger">*</span>
               </label>
               <select
@@ -309,7 +306,9 @@
 
             <!-- Observações -->
             <div class="col-md-12">
-              <label for="observacoes" class="form-label"> Observações </label>
+              <label for="observacoes" class="form-label text-body">
+                Observações
+              </label>
               <textarea
                 class="form-control"
                 id="observacoes"

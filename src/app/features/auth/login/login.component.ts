@@ -74,7 +74,7 @@ export class LoginComponent implements OnInit {
 
     const credentials = {
       email: this.loginForm.value.email,
-      password: this.loginForm.value.password,
+      senha: this.loginForm.value.password,
     };
 
     console.log('Tentando fazer login com:', credentials.email);
