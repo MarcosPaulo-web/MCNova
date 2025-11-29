@@ -1,31 +1,38 @@
 <header class="header">
   <div class="header-content">
-   
     <div class="header-title">
-      <h5 class="mb-0">Bem-vindo ao Sistema</h5>
+      <h5 class="mb-0 text-body">Bem-vindo ao Sistema</h5>
     </div>
-    
- 
+
     @if (currentUser(); as user) {
-      <div class="user-info">
-        <div class="user-details">
-          <span class="user-name">{{ user.nmUsuario }}</span>
-          <span class="user-role">{{ getRoleLabel(user.roles) }}</span>
-        </div>
-        
-        <div class="user-avatar">
-          <i class="bi bi-person-circle"></i>
-        </div>
-        
-        <button 
-          class="btn btn-sm btn-outline-danger ms-3" 
-          (click)="logout()"
-          title="Sair do Sistema"
-        >
-          <i class="bi bi-box-arrow-right"></i>
-          Sair
-        </button>
+    <div class="user-info">
+      <select
+        class="form-select form-select-sm w-auto text-body"
+        [value]="themeAtual"
+        (change)="trocarTema($event)"
+      >
+        <option value="light">Claro</option>
+        <option value="dark">Escuro</option>
+        <option value="access">Acessível</option>
+      </select>
+      <div class="user-details">
+        <span class="user-name text-body">{{ user.nmUsuario }}</span>
+        <span class="user-role text-body">{{ getRoleLabel(user.roles) }}</span>
       </div>
+
+      <div class="user-avatar">
+        <i class="bi bi-person-circle"></i>
+      </div>
+
+      <button
+        class="btn btn-sm btn-outline-danger ms-3"
+        (click)="logout()"
+        title="Sair do Sistema"
+      >
+        <i class="bi bi-box-arrow-right"></i>
+        Sair
+      </button>
+    </div>
     }
   </div>
 </header>
