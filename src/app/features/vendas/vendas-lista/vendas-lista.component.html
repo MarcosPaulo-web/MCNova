@@ -55,12 +55,12 @@
         <table class="table table-hover mb-0">
           <thead>
             <tr>
-              <th>Data</th>
-              <th>Cliente</th>
-              <th>Atendente</th>
-              <th>Itens</th>
-              <th>Pagamento</th>
-              <th>Total</th>
+              <th>DATA</th>
+              <th>CLIENTE</th>
+              <th>ATENDENTE</th>
+              <th>ITENS</th>
+              <th>PAGAMENTO</th>
+              <th>TOTAL</th>
             </tr>
           </thead>
           <tbody>
@@ -84,8 +84,9 @@
                 }}</small>
               </td>
               <td>
+                <!-- ✅ CORRIGIDO: Usar método contarItens -->
                 <span class="badge bg-info"
-                  >{{ venda.itens?.length || 0 }} produto(s)</span
+                  >{{ contarItens(venda) }} produto(s)</span
                 >
               </td>
               <td>

@@ -6,7 +6,6 @@ import { ClienteService } from '../../../core/services/cliente.service';
 import { ProdutoService } from '../../../core/services/produto.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Venda, VendaRequest, ItemVendaRequest, Cliente, Produto, FormaPagamento } from '../../../core/models';
-import { formatarData } from '../../../core/utils/formatters.util';
 
 declare var bootstrap: any;
 
@@ -91,12 +90,13 @@ export class VendasListaComponent implements OnInit {
     return new Promise((resolve) => {
       this.vendaService.listarTodas().subscribe({
         next: (vendas) => {
+          console.log('📦 Vendas recebidas:', vendas);
           this.vendas.set(vendas);
           this.aplicarFiltro();
           resolve();
         },
         error: (error) => {
-          console.error('Erro ao carregar vendas:', error);
+          console.error('❌ Erro ao carregar vendas:', error);
           resolve();
         }
       });
@@ -264,7 +264,7 @@ export class VendasListaComponent implements OnInit {
         this.isSubmitting.set(false);
         this.fecharModal();
         
-        // ✅ RECARREGAR PRODUTOS E VENDAS
+        // Recarregar produtos e vendas
         Promise.all([
           this.carregarVendas(),
           this.carregarProdutos()
@@ -280,7 +280,10 @@ export class VendasListaComponent implements OnInit {
     });
   }
   
+  // ========== FORMATADORES ==========
+  
   formatarMoeda(valor: number): string {
+    if (!valor && valor !== 0) return 'R$ 0,00';
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
@@ -292,15 +295,62 @@ export class VendasListaComponent implements OnInit {
     return formaObj?.label || forma;
   }
   
-  // ✅ MÉTODO PARA OBTER NOME DO CLIENTE
   getClienteNome(cdCliente?: number): string {
     if (!cdCliente) return 'Sem cliente';
     const cliente = this.clientes().find(c => c.cdCliente === cdCliente);
     return cliente?.nmCliente || 'Cliente não encontrado';
   }
   
-  formatarData(data: string): string {
-    if (!data) return '-';
-    return formatarData(data);
+  // ✅ CORRIGIDO: Formatação de data
+  formatarData(dataISO: string): string {
+    if (!dataISO) return '-';
+    
+    try {
+      // Tenta vários formatos de data
+      let data: Date;
+      
+      // Se vier como ISO: "2025-11-27T10:30:00"
+      if (dataISO.includes('T')) {
+        data = new Date(dataISO);
+      }
+      // Se vier como LocalDateTime: "2025-11-27 10:30:00"
+      else if (dataISO.includes(' ')) {
+        const [datePart, timePart] = dataISO.split(' ');
+        data = new Date(`${datePart}T${timePart}`);
+      }
+      // Se vier como LocalDate: "2025-11-27"
+      else {
+        data = new Date(dataISO + 'T00:00:00');
+      }
+      
+      // Verifica se a data é válida
+      if (isNaN(data.getTime())) {
+        console.error('❌ Data inválida:', dataISO);
+        return '-';
+      }
+      
+      // Formata: "27/11/2025 10:30"
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const ano = data.getFullYear();
+      const hora = String(data.getHours()).padStart(2, '0');
+      const min = String(data.getMinutes()).padStart(2, '0');
+      
+      return `${dia}/${mes}/${ano} ${hora}:${min}`;
+    } catch (error) {
+      console.error('❌ Erro ao formatar data:', dataISO, error);
+      return '-';
+    }
+  }
+  
+  // ✅ MÉTODO PARA CONTAR ITENS DA VENDA
+  contarItens(venda: Venda): number {
+    // Se a venda tem itens no objeto
+    if (venda.itens && Array.isArray(venda.itens)) {
+      return venda.itens.length;
+    }
+    
+    // Fallback: se não tem itens, retorna 0
+    return 0;
   }
 }
