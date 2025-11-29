@@ -1,7 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+// src/app/features/auth/login/login.component.ts
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -11,14 +12,16 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   
   loginForm: FormGroup;
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
+  mensagemInfo = signal<string | null>(null);
   showPassword = signal(false);
   
   constructor() {
@@ -32,6 +35,29 @@ export class LoginComponent {
       password: ['', [Validators.required, Validators.minLength(3)]]
     });
   }
+
+  ngOnInit(): void {
+    // ✅ Captura erros e mensagens vindos do callback OAuth2
+    this.route.queryParams.subscribe(params => {
+      const error = params['error'];
+      const tipo = params['tipo'] || 'error';  // ✅ Novo: tipo de mensagem
+      
+      if (error) {
+        console.error('❌ Erro recebido da URL:', error);
+        
+        const mensagem = this.getErrorMessage(error);
+        
+        // ✅ Define se é info (azul) ou erro (vermelho)
+        if (tipo === 'info') {
+          this.mensagemInfo.set(mensagem);
+          this.errorMessage.set(null);
+        } else {
+          this.errorMessage.set(mensagem);
+          this.mensagemInfo.set(null);
+        }
+      }
+    });
+  }
   
   onSubmit(): void {
     if (this.loginForm.invalid) {
@@ -41,6 +67,7 @@ export class LoginComponent {
     
     this.isLoading.set(true);
     this.errorMessage.set(null);
+    this.mensagemInfo.set(null);
     
     const credentials = {
       email: this.loginForm.value.email,
@@ -52,14 +79,11 @@ export class LoginComponent {
     this.authService.login(credentials).subscribe({
       next: (response) => {
         console.log('✅ Login bem-sucedido:', response);
-        console.log('🔑 Token:', response.accessToken);
-        console.log('👤 Usuário:', response.usuario);
-        
         this.isLoading.set(false);
-     
+        // AuthService já redireciona para dashboard
       },
       error: (error) => {
-        console.error('Erro no login:', error);
+        console.error('❌ Erro no login:', error);
         this.isLoading.set(false);
         this.errorMessage.set(
           error.message || 'Email ou senha incorretos. Tente novamente.'
@@ -68,8 +92,21 @@ export class LoginComponent {
     });
   }
   
+  // ✅ Login com Google
   loginWithGoogle(): void {
-    this.authService.loginWithGoogle();
+    console.log('🔵 Botão Google clicado');
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+    this.mensagemInfo.set(null);
+    
+    try {
+      this.authService.loginWithGoogle();
+      // O redirecionamento acontece no service
+    } catch (error) {
+      console.error('❌ Erro ao iniciar login Google:', error);
+      this.isLoading.set(false);
+      this.errorMessage.set('Erro ao conectar com Google. Tente novamente.');
+    }
   }
   
   togglePasswordVisibility(): void {
@@ -104,5 +141,20 @@ export class LoginComponent {
       const control = formGroup.get(key);
       control?.markAsTouched();
     });
+  }
+  
+  private getErrorMessage(error: string): string {
+    const errorMessages: Record<string, string> = {
+      'user_not_registered': '👤 Usuário não cadastrado no sistema. Entre em contato com o administrador para criar sua conta antes de fazer login com Google.',
+      'no_token': 'Token de autenticação não foi recebido do Google.',
+      'google_auth_failed': 'Falha na autenticação com Google. Tente novamente.',
+      'access_denied': '🚫 Você cancelou a autenticação com Google.',
+      'user_inactive': 'Seu usuário está inativo. Entre em contato com o administrador.',
+      'server_error': 'Erro no servidor. Tente novamente mais tarde.',
+      'invalid_token': 'Token de autenticação inválido.',
+      'no_auth': 'Autenticação não foi concluída.'
+    };
+    
+    return errorMessages[error] || 'Erro na autenticação. Tente novamente.';
   }
 }

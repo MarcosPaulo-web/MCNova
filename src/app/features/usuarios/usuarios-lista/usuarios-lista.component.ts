@@ -33,12 +33,18 @@ export class UsuariosListaComponent implements OnInit {
   modoEdicao = signal(false);
   usuarioEditando = signal<Usuario | null>(null);
   
-  searchTerm = signal('');
+  searchTerm = '';
   
   roles = [
     { value: UserRole.ROLE_ADMIN, label: 'Administrador' },
     { value: UserRole.ROLE_ATENDENTE, label: 'Atendente' },
     { value: UserRole.ROLE_MECANICO, label: 'Mecânico' }
+  ];
+
+  // ✅ Opções de provider
+  providers = [
+    { value: AuthProvider.LOCAL, label: 'Local (Email e Senha)' },
+    { value: AuthProvider.GOOGLE, label: 'Google OAuth2' }
   ];
   
   ngOnInit(): void {
@@ -56,8 +62,33 @@ export class UsuariosListaComponent implements OnInit {
     this.usuarioForm = this.fb.group({
       nmUsuario: ['', [Validators.required, Validators.maxLength(120)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
-      senha: ['', [Validators.minLength(6)]],
-      roles: [[], [Validators.required]]
+      senha: ['', [Validators.minLength(3)]],
+      provider: [AuthProvider.LOCAL, [Validators.required]],  // ✅ ADICIONADO
+      roles: [[], [Validators.required]],
+      cpf: ['', [Validators.required, Validators.maxLength(14)]],  // ✅ ADICIONADO
+      telefone: ['', [Validators.maxLength(20)]],  // ✅ ADICIONADO
+      ativo: [true]  // ✅ ADICIONADO
+    });
+
+    // ✅ Monitora mudanças no provider
+    this.usuarioForm.get('provider')?.valueChanges.subscribe(provider => {
+      const senhaControl = this.usuarioForm.get('senha');
+      
+      if (provider === AuthProvider.LOCAL) {
+        // Local: senha obrigatória (no modo criar)
+        if (!this.modoEdicao()) {
+          senhaControl?.setValidators([Validators.required, Validators.minLength(3)]);
+        } else {
+          senhaControl?.setValidators([Validators.minLength(3)]);
+        }
+      } else {
+        // Google: senha não é obrigatória
+        senhaControl?.clearValidators();
+        senhaControl?.setValidators([Validators.minLength(3)]);
+        senhaControl?.setValue('');
+      }
+      
+      senhaControl?.updateValueAndValidity();
     });
   }
   
@@ -78,7 +109,7 @@ export class UsuariosListaComponent implements OnInit {
   }
   
   aplicarFiltro(): void {
-    const termo = this.searchTerm().toLowerCase();
+    const termo = this.searchTerm.toLowerCase();
     
     if (!termo) {
       this.usuariosFiltrados.set(this.usuarios());
@@ -96,9 +127,15 @@ export class UsuariosListaComponent implements OnInit {
   abrirModalNovo(): void {
     this.modoEdicao.set(false);
     this.usuarioEditando.set(null);
-    this.usuarioForm.reset();
-    this.usuarioForm.get('senha')?.setValidators([Validators.required, Validators.minLength(6)]);
+    this.usuarioForm.reset({
+      provider: AuthProvider.LOCAL,  // ✅ Valor padrão
+      ativo: true
+    });
+    
+    // Senha obrigatória no modo criar LOCAL
+    this.usuarioForm.get('senha')?.setValidators([Validators.required, Validators.minLength(3)]);
     this.usuarioForm.get('senha')?.updateValueAndValidity();
+    
     this.modalInstance?.show();
   }
   
@@ -110,12 +147,16 @@ export class UsuariosListaComponent implements OnInit {
       nmUsuario: usuario.nmUsuario,
       email: usuario.email,
       senha: '',
-      roles: usuario.roles || []
+      provider: usuario.provider || AuthProvider.LOCAL,
+      roles: usuario.roles || [],
+      cpf: usuario.cpf || '',
+      telefone: usuario.telefone || '',
+      ativo: usuario.ativo !== false
     });
     
     // Senha opcional na edição
     this.usuarioForm.get('senha')?.clearValidators();
-    this.usuarioForm.get('senha')?.setValidators([Validators.minLength(6)]);
+    this.usuarioForm.get('senha')?.setValidators([Validators.minLength(3)]);
     this.usuarioForm.get('senha')?.updateValueAndValidity();
     
     this.modalInstance?.show();
@@ -129,24 +170,39 @@ export class UsuariosListaComponent implements OnInit {
   salvar(): void {
     if (this.usuarioForm.invalid) {
       this.marcarCamposComoTocados();
+      console.log('Formulário inválido:', this.usuarioForm.errors);
+      console.log('Valores:', this.usuarioForm.value);
       return;
     }
     
     this.isSubmitting.set(true);
     
     const formValue = this.usuarioForm.value;
-    const dados: UsuarioRequest = {
+    
+    // ✅ Monta o objeto com TODOS os campos necessários
+    const dados: any = {
       nmUsuario: formValue.nmUsuario,
       email: formValue.email,
       senha: formValue.senha || undefined,
+      provider: formValue.provider,
       roles: formValue.roles,
-      authProvider: AuthProvider.LOCAL
+      cpf: formValue.cpf,
+      telefone: formValue.telefone || undefined,
+      ativo: formValue.ativo !== false,
+      providerId: null
     };
     
     // Remove senha vazia na edição
     if (this.modoEdicao() && !dados.senha) {
       delete dados.senha;
     }
+
+    // Se for Google, remove senha
+    if (dados.provider === AuthProvider.GOOGLE) {
+      delete dados.senha;
+    }
+    
+    console.log('Enviando dados:', dados);
     
     const operacao = this.modoEdicao()
       ? this.usuarioService.atualizar(this.usuarioEditando()!.cdUsuario, dados)
@@ -157,6 +213,7 @@ export class UsuariosListaComponent implements OnInit {
         this.isSubmitting.set(false);
         this.fecharModal();
         this.carregarUsuarios();
+        alert('Usuário salvo com sucesso!');
       },
       error: (error) => {
         console.error('Erro ao salvar usuário:', error);
@@ -178,6 +235,7 @@ export class UsuariosListaComponent implements OnInit {
       this.usuarioService.deletar(usuario.cdUsuario).subscribe({
         next: () => {
           this.carregarUsuarios();
+          alert('Usuário excluído com sucesso!');
         },
         error: (error) => {
           console.error('Erro ao excluir usuário:', error);

@@ -1,6 +1,4 @@
 export const environment = {
-  production: true,
-  apiUrl: '/api',
-  googleClientId: '281426395256-bobgckahl1pvi6ebh9steibdj28li5v9.apps.googleusercontent.com',
-  oauth2RedirectUri: window.location.origin + '/auth/callback'
+  production: false,
+  apiUrl: 'http://localhost:8084/api'
 };

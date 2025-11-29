@@ -19,24 +19,24 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<Usuario | null>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
   
-  constructor() {}
-  
+  // Login normal
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials)
-      .pipe(
-        tap(response => this.handleAuthSuccess(response))
-      );
+      .pipe(tap(response => this.handleAuthSuccess(response)));
   }
   
+  // Registro
   register(data: UsuarioRequest): Observable<Usuario> {
     return this.http.post<Usuario>(`${environment.apiUrl}/auth/register`, data);
   }
 
+  // ✅ SUPER SIMPLES - Login com Google
   loginWithGoogle(): void {
-    const googleAuthUrl = `${environment.apiUrl.replace('/api', '')}/oauth2/authorization/google`;
-    window.location.href = googleAuthUrl;
+    // Redireciona direto para o backend (tira o /api da URL)
+    window.location.href = 'http://localhost:8084/oauth2/authorization/google';
   }
   
+  // ✅ Callback do Google
   handleGoogleCallback(token: string): void {
     this.http.get<Usuario>(`${environment.apiUrl}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -50,9 +50,22 @@ export class AuthService {
         this.handleAuthSuccess(authResponse);
       },
       error: (error) => {
-        console.error('Erro no callback do Google:', error);
+        console.error('Erro:', error);
+        
+        // ✅ Identifica se é usuário não cadastrado
+        let errorType = 'google_auth_failed';
+        let tipoMensagem = 'error';
+        
+        if (error.status === 404 || error.status === 401) {
+          errorType = 'user_not_registered';
+          tipoMensagem = 'info';
+        }
+        
         this.router.navigate(['/auth/login'], { 
-          queryParams: { error: 'google_auth_failed' } 
+          queryParams: { 
+            error: errorType,
+            tipo: tipoMensagem
+          } 
         });
       }
     });
@@ -82,7 +95,6 @@ export class AuthService {
     return user?.roles?.includes(role as any) || false;
   }
   
-
   hasAnyRole(roles: string[]): boolean {
     return roles.some(role => this.hasRole(role));
   }
