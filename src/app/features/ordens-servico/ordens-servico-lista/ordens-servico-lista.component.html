@@ -101,7 +101,6 @@
           <tbody>
             @for (ordem of ordensFiltradas(); track ordem.cdOrdemServico) {
             <tr>
-              <!-- ✅ MELHORADO: Mostra #OC para orçamento e #OS para ordem -->
               <td>
                 <strong class="text-primary">
                   @if (ordem.tipoOrdemOrcamento === 'ORCAMENTO') { #OC{{
@@ -294,9 +293,8 @@
               </h6>
             </div>
 
-            <!-- ✅ TIPO: Orçamento ou Ordem de Serviço -->
             <div class="col-md-3">
-              <label for="tipoOrdemOrcamento" class="form-label">
+              <label for="tipoOrdemOrcamento" class="form-label text-body">
                 Tipo <span class="text-danger">*</span>
               </label>
               <select
@@ -319,7 +317,7 @@
             </div>
 
             <div class="col-md-3">
-              <label for="cdCliente" class="form-label">
+              <label for="cdCliente" class="form-label text-body">
                 Cliente <span class="text-danger">*</span>
               </label>
               <select
@@ -337,7 +335,7 @@
             </div>
 
             <div class="col-md-3">
-              <label for="cdVeiculo" class="form-label">
+              <label for="cdVeiculo" class="form-label text-body">
                 Veículo <span class="text-danger">*</span>
               </label>
               <select
@@ -356,7 +354,7 @@
             </div>
 
             <div class="col-md-3">
-              <label for="cdMecanico" class="form-label">
+              <label for="cdMecanico" class="form-label text-body">
                 Mecânico <span class="text-danger">*</span>
               </label>
               <select
@@ -374,7 +372,7 @@
             </div>
 
             <div class="col-md-4">
-              <label for="dataAgendamento" class="form-label">
+              <label for="dataAgendamento" class="form-label text-body">
                 Data de Agendamento @if
                 (ordemForm.get('tipoOrdemOrcamento')?.value ===
                 'ORDEM_DE_SERVICO') {
@@ -403,7 +401,7 @@
             </div>
 
             <div class="col-12">
-              <div class="card bg-light">
+              <div class="card bg-body">
                 <div class="card-body">
                   <div class="row g-2">
                     <div class="col-md-6">
@@ -456,7 +454,7 @@
             </div>
 
             <div class="col-12">
-              <div class="card bg-light">
+              <div class="card bg-body">
                 <div class="card-body">
                   <div class="row g-2">
                     <div class="col-md-9">
@@ -576,7 +574,9 @@
 
             <!-- Diagnóstico -->
             <div class="col-12 mt-3">
-              <label for="diagnostico" class="form-label">Diagnóstico</label>
+              <label for="diagnostico" class="form-label text-body"
+                >Diagnóstico</label
+              >
               <textarea
                 class="form-control"
                 id="diagnostico"
@@ -672,7 +672,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="dataAgendamentoAprovar" class="form-label">
+            <label for="dataAgendamentoAprovar" class="form-label text-body">
               Data de Agendamento <span class="text-danger">*</span>
             </label>
             <input
@@ -747,7 +747,7 @@
           }
 
           <div class="mb-3">
-            <label for="editVlMaoObraExtra" class="form-label">
+            <label for="editVlMaoObraExtra" class="form-label text-body">
               Mão de Obra Extra (R$)
             </label>
             <div class="input-group">
@@ -764,7 +764,9 @@
           </div>
 
           <div class="mb-3">
-            <label for="editDiagnostico" class="form-label">Diagnóstico</label>
+            <label for="editDiagnostico" class="form-label text-body"
+              >Diagnóstico</label
+            >
             <textarea
               class="form-control"
               id="editDiagnostico"
@@ -831,7 +833,7 @@
           }
 
           <div class="mb-3">
-            <label for="formaPagamento" class="form-label">
+            <label for="formaPagamento" class="form-label text-body">
               Forma de Pagamento <span class="text-danger">*</span>
             </label>
             <select
