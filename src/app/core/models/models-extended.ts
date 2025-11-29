@@ -49,7 +49,7 @@ export interface Produto {
   nmProduto: string;
   dsProduto?: string;
   categoria?: string;
-  vlProduto: number;      // ✅ ÚNICO CAMPO DE VALOR
+  vlProduto: number;     
   qtdEstoque: number;
   qtdMinimoEstoque: number;     
   ativo: boolean;
@@ -59,9 +59,9 @@ export interface ProdutoRequest {
   nmProduto: string;
   dsProduto?: string;
   categoria?: string;
-  vlProduto: number;      // ✅ ÚNICO CAMPO DE VALOR
+  vlProduto: number;     
   qtdEstoque: number;
-  qtdMinimo: number;      // ✅ CORRIGIDO
+  qtdMinimoEstoque: number;   
 }
 
 // ==================== SERVICO ====================
