@@ -1,5 +1,4 @@
 <div class="veiculos-page">
- 
   <div class="page-header">
     <div>
       <h2>
@@ -61,7 +60,7 @@
               <th>Ano</th>
               <th>Cor</th>
               <th>Cliente</th>
-           
+
               <th class="text-center">Ações</th>
             </tr>
           </thead>
@@ -82,7 +81,7 @@
               <td>
                 <small>{{ getClienteNome(veiculo.cdCliente) || "-" }}</small>
               </td>
-             
+
               <td class="text-center">
                 <div class="btn-group btn-group-sm">
                   <button
@@ -124,7 +123,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">
+        <h5 class="modal-title text-white">
           @if (modoEdicao()) {
           <i class="bi bi-pencil me-2"></i>
           Editar Veículo } @else {

@@ -1,5 +1,4 @@
 <div class="agendamentos-page">
-  
   <div class="page-header">
     <div>
       <h2>
@@ -55,7 +54,6 @@
     </div>
   </div>
 
- 
   @if (isLoading()) {
   <div class="text-center py-5">
     <div class="spinner-border text-primary" role="status">
@@ -101,36 +99,44 @@
               <td>
                 <small>{{ agendamento.observacoes || "-" }}</small>
               </td>
-             
+
               <td>
                 <div class="status-dropdown-container">
-                  <span 
-                    class="badge status-clickable" 
+                  <span
+                    class="badge status-clickable"
                     [ngClass]="getStatusClass(agendamento.status)"
-                    (click)="toggleDropdownStatus(agendamento.cdAgendamento, $event)"
+                    (click)="
+                      toggleDropdownStatus(agendamento.cdAgendamento, $event)
+                    "
                     title="Clique para alterar o status"
                   >
                     {{ getStatusLabel(agendamento.status) }}
                     <i class="bi bi-chevron-down ms-1"></i>
                   </span>
-                  
+
                   <!-- Dropdown Menu -->
                   @if (isDropdownAberto(agendamento.cdAgendamento)) {
-                    <div class="status-dropdown-menu">
-                      @for (statusOpt of statusDropdownOptions; track statusOpt.value) {
-                        <div 
-                          class="status-dropdown-item"
-                          [class.active]="agendamento.status === statusOpt.value"
-                          (click)="mudarStatus(agendamento, statusOpt.value, $event)"
-                        >
-                          <i class="bi bi-{{ statusOpt.icon }} me-2" [class]="'text-' + statusOpt.class"></i>
-                          <span>{{ statusOpt.label }}</span>
-                          @if (agendamento.status === statusOpt.value) {
-                            <i class="bi bi-check2 ms-auto text-success"></i>
-                          }
-                        </div>
+                  <div class="status-dropdown-menu">
+                    @for (statusOpt of statusDropdownOptions; track
+                    statusOpt.value) {
+                    <div
+                      class="status-dropdown-item"
+                      [class.active]="agendamento.status === statusOpt.value"
+                      (click)="
+                        mudarStatus(agendamento, statusOpt.value, $event)
+                      "
+                    >
+                      <i
+                        class="bi bi-{{ statusOpt.icon }} me-2"
+                        [class]="'text-' + statusOpt.class"
+                      ></i>
+                      <span>{{ statusOpt.label }}</span>
+                      @if (agendamento.status === statusOpt.value) {
+                      <i class="bi bi-check2 ms-auto text-success"></i>
                       }
                     </div>
+                    }
+                  </div>
                   }
                 </div>
               </td>
@@ -168,7 +174,6 @@
         </table>
       </div>
 
-    
       <div class="table-footer">
         <span class="text-muted">
           Total:
@@ -186,7 +191,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">
+        <h5 class="modal-title text-white">
           @if (modoEdicao()) {
           <i class="bi bi-pencil me-2"></i>
           Editar Agendamento } @else {
@@ -304,9 +309,7 @@
 
             <!-- Observações -->
             <div class="col-md-12">
-              <label for="observacoes" class="form-label">
-                Observações
-              </label>
+              <label for="observacoes" class="form-label"> Observações </label>
               <textarea
                 class="form-control"
                 id="observacoes"

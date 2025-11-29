@@ -15,7 +15,6 @@
     </button>
   </div>
 
- 
   <div class="search-bar card">
     <div class="card-body">
       <div class="input-group">
@@ -33,7 +32,6 @@
     </div>
   </div>
 
-
   @if (isLoading()) {
   <div class="text-center py-5">
     <div class="spinner-border text-primary" role="status">
@@ -42,7 +40,7 @@
     <p class="text-muted mt-2">Carregando usuários...</p>
   </div>
   } @else {
-  
+
   <div class="card">
     <div class="card-body p-0">
       @if (usuariosFiltrados().length === 0) {
@@ -118,7 +116,6 @@
         </table>
       </div>
 
-    
       <div class="table-footer">
         <span class="text-muted">
           Total: <strong>{{ usuariosFiltrados().length }}</strong> usuário(s)
@@ -130,12 +127,11 @@
   }
 </div>
 
-
 <div class="modal fade" #usuarioModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">
+        <h5 class="modal-title text-white">
           @if (modoEdicao()) {
           <i class="bi bi-pencil me-2"></i>
           Editar Usuário } @else {
@@ -172,7 +168,6 @@
               }
             </div>
 
-      
             <div class="col-md-6">
               <label for="email" class="form-label">
                 Email <span class="text-danger">*</span>
@@ -192,7 +187,6 @@
               }
             </div>
 
-            
             <div class="col-md-6">
               <label for="cpf" class="form-label">
                 CPF <span class="text-danger">*</span>
@@ -213,11 +207,8 @@
               }
             </div>
 
-        
             <div class="col-md-6">
-              <label for="telefone" class="form-label">
-                Telefone
-              </label>
+              <label for="telefone" class="form-label"> Telefone </label>
               <input
                 type="text"
                 class="form-control"
@@ -234,7 +225,6 @@
               }
             </div>
 
-            
             <div class="col-12">
               <label class="form-label">
                 Tipo de Autenticação <span class="text-danger">*</span>
@@ -249,23 +239,30 @@
                     [value]="prov.value"
                     formControlName="provider"
                   />
-                  <label class="form-check-label" [for]="'provider_' + prov.value">
-                    <i class="bi" [ngClass]="prov.value === 'GOOGLE' ? 'bi-google' : 'bi-shield-lock'"></i>
+                  <label
+                    class="form-check-label"
+                    [for]="'provider_' + prov.value"
+                  >
+                    <i
+                      class="bi"
+                      [ngClass]="
+                        prov.value === 'GOOGLE' ? 'bi-google' : 'bi-shield-lock'
+                      "
+                    ></i>
                     {{ prov.label }}
                   </label>
                 </div>
                 }
               </div>
               <small class="text-muted">
-                 Usuários Google devem usar o mesmo email da conta Google
+                Usuários Google devem usar o mesmo email da conta Google
               </small>
             </div>
-        
+
             @if (usuarioForm.get('provider')?.value === 'LOCAL') {
             <div class="col-12">
               <label for="senha" class="form-label">
-                Senha 
-                @if (!modoEdicao()) {
+                Senha @if (!modoEdicao()) {
                 <span class="text-danger">*</span>
                 }
               </label>
@@ -293,7 +290,7 @@
             </div>
             }
 
-                      <div class="col-12">
+            <div class="col-12">
               <label class="form-label">
                 Perfil de Acesso <span class="text-danger">*</span>
               </label>
