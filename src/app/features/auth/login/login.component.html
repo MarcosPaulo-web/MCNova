@@ -1,15 +1,15 @@
 <div class="login-page">
   <div class="login-container">
-    <!-- Card de Login -->
+  
     <div class="login-card">
-      <!-- Logo/Header -->
+  
       <div class="login-header">
         <i class="bi bi-wrench-adjustable"></i>
         <h2>SGM</h2>
         <p class="text-muted">Sistema de Gestão Mecânica</p>
       </div>
       
-      <!-- Alerta de Erro -->
+     
       @if (errorMessage()) {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
           <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -23,7 +23,6 @@
         </div>
       }
       
-      <!-- ✅ Alerta de usuário não cadastrado -->
       @if (mensagemInfo()) {
         <div class="alert alert-info alert-dismissible fade show" role="alert">
           <i class="bi bi-info-circle-fill me-2"></i>
@@ -37,9 +36,9 @@
         </div>
       }
       
-      <!-- Formulário de Login -->
+
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <!-- Email -->
+      
         <div class="mb-3">
           <label for="email" class="form-label">
             <i class="bi bi-envelope me-1"></i>
@@ -60,7 +59,7 @@
           }
         </div>
         
-        <!-- Senha -->
+       
         <div class="mb-3">
           <label for="password" class="form-label">
             <i class="bi bi-lock me-1"></i>
@@ -91,7 +90,6 @@
           }
         </div>
         
-        <!-- Botão Login -->
         <button
           type="submit"
           class="btn btn-primary w-100 mb-3"
@@ -106,13 +104,11 @@
           }
         </button>
       </form>
-      
-      <!-- Divisor -->
+            
       <div class="divider">
         <span>OU</span>
       </div>
       
-      <!-- Login com Google -->
       <button
         type="button"
         class="btn btn-outline-danger w-100"
@@ -122,8 +118,7 @@
         <i class="bi bi-google me-2"></i>
         Entrar com Google
       </button>
-      
-      
+            
     </div>
   </div>
 </div>

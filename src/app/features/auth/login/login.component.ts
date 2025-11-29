@@ -37,17 +37,17 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // ✅ Captura erros e mensagens vindos do callback OAuth2
+
     this.route.queryParams.subscribe(params => {
       const error = params['error'];
-      const tipo = params['tipo'] || 'error';  // ✅ Novo: tipo de mensagem
+      const tipo = params['tipo'] || 'error';  
       
       if (error) {
-        console.error('❌ Erro recebido da URL:', error);
+        console.error('Erro recebido da URL:', error);
         
         const mensagem = this.getErrorMessage(error);
         
-        // ✅ Define se é info (azul) ou erro (vermelho)
+    
         if (tipo === 'info') {
           this.mensagemInfo.set(mensagem);
           this.errorMessage.set(null);
@@ -74,16 +74,16 @@ export class LoginComponent implements OnInit {
       senha: this.loginForm.value.password
     };
     
-    console.log('🔐 Tentando fazer login com:', credentials.email);
+    console.log('Tentando fazer login com:', credentials.email);
     
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        console.log('✅ Login bem-sucedido:', response);
+        console.log('Login bem-sucedido:', response);
         this.isLoading.set(false);
-        // AuthService já redireciona para dashboard
+       
       },
       error: (error) => {
-        console.error('❌ Erro no login:', error);
+        console.error('Erro no login:', error);
         this.isLoading.set(false);
         this.errorMessage.set(
           error.message || 'Email ou senha incorretos. Tente novamente.'
@@ -92,7 +92,7 @@ export class LoginComponent implements OnInit {
     });
   }
   
-  // ✅ Login com Google
+
   loginWithGoogle(): void {
     console.log('🔵 Botão Google clicado');
     this.isLoading.set(true);
@@ -101,9 +101,9 @@ export class LoginComponent implements OnInit {
     
     try {
       this.authService.loginWithGoogle();
-      // O redirecionamento acontece no service
+    
     } catch (error) {
-      console.error('❌ Erro ao iniciar login Google:', error);
+      console.error('Erro ao iniciar login Google:', error);
       this.isLoading.set(false);
       this.errorMessage.set('Erro ao conectar com Google. Tente novamente.');
     }
@@ -145,10 +145,10 @@ export class LoginComponent implements OnInit {
   
   private getErrorMessage(error: string): string {
     const errorMessages: Record<string, string> = {
-      'user_not_registered': '👤 Usuário não cadastrado no sistema. Entre em contato com o administrador para criar sua conta antes de fazer login com Google.',
+      'user_not_registered': 'Usuário não cadastrado no sistema. Entre em contato com o administrador para criar sua conta antes de fazer login com Google.',
       'no_token': 'Token de autenticação não foi recebido do Google.',
       'google_auth_failed': 'Falha na autenticação com Google. Tente novamente.',
-      'access_denied': '🚫 Você cancelou a autenticação com Google.',
+      'access_denied': ' Você cancelou a autenticação com Google.',
       'user_inactive': 'Seu usuário está inativo. Entre em contato com o administrador.',
       'server_error': 'Erro no servidor. Tente novamente mais tarde.',
       'invalid_token': 'Token de autenticação inválido.',
