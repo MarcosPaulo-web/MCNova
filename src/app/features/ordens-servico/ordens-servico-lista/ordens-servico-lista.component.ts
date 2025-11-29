@@ -75,6 +75,7 @@ export class OrdensServicoListaComponent implements OnInit {
   
   dropdownAbertoId = signal<number | null>(null);
   filtroStatus = signal<Status | 'TODOS'>('TODOS');
+  searchTerm = '';
   
   statusOptions = [
     { value: 'TODOS' as const, label: 'Todos', class: 'secondary' },
@@ -132,14 +133,13 @@ export class OrdensServicoListaComponent implements OnInit {
   }
   
   inicializarForms(): void {
-    // ✅ CORRIGIDO: tipoOrdemOrcamento em vez de TipoOrdemOrcamento
     this.ordemForm = this.fb.group({
       cdCliente: ['', [Validators.required]],
       cdVeiculo: ['', [Validators.required]],
       cdMecanico: ['', [Validators.required]],
       tipoOrdemOrcamento: [TipoOrdemOrcamento.ORDEM_DE_SERVICO, [Validators.required]],
       dataAgendamento: [''],
-      vlMaoObraExtra: [0],  // ✅ ADICIONADO
+      vlMaoObraExtra: [0],
       diagnostico: ['']
     });
     
@@ -149,7 +149,7 @@ export class OrdensServicoListaComponent implements OnInit {
     
     this.editarForm = this.fb.group({
       diagnostico: [''],
-      vlMaoObraExtra: [0]  // ✅ ADICIONADO
+      vlMaoObraExtra: [0]
     });
     
     this.concluirForm = this.fb.group({
@@ -164,7 +164,6 @@ export class OrdensServicoListaComponent implements OnInit {
       }
     });
     
-    // ✅ CORRIGIDO: validação dinâmica de dataAgendamento
     this.ordemForm.get('tipoOrdemOrcamento')?.valueChanges.subscribe(tipo => {
       const dataControl = this.ordemForm.get('dataAgendamento');
       if (tipo === TipoOrdemOrcamento.ORDEM_DE_SERVICO) {
@@ -189,31 +188,37 @@ export class OrdensServicoListaComponent implements OnInit {
     });
   }
   
-  // ✅ CORRIGIDO: Método separado sem finally
+  // ✅ CORRIGIDO: Buscar todas as ordens de uma vez
   carregarOrdens(): Promise<void> {
     return new Promise((resolve) => {
-      Promise.all([
-        this.ordemServicoService.listarPorStatus(Status.AGENDADO).toPromise(),
-        this.ordemServicoService.listarPorStatus(Status.EM_ANDAMENTO).toPromise(),
-        this.ordemServicoService.listarPorStatus(Status.CONCLUIDO).toPromise(),
-        this.ordemServicoService.listarPorStatus(Status.CANCELADO).toPromise(),
-        this.ordemServicoService.listarOrcamentosPendentes().toPromise()
-      ]).then(([aguardando, emAndamento, concluidas, canceladas, orcamentos]) => {
-        const todasOrdens = [
-          ...(aguardando || []),
-          ...(emAndamento || []),
-          ...(concluidas || []),
-          ...(canceladas || []),
-          ...(orcamentos || [])
-        ];
-        
-        console.log('📦 Ordens carregadas:', todasOrdens.length);
-        this.ordens.set(todasOrdens);
-        this.aplicarFiltro();
-        resolve();
-      }).catch((error) => {
-        console.error('❌ Erro ao carregar ordens:', error);
-        resolve();
+      console.log('🔄 Carregando TODAS as ordens...');
+      
+      this.ordemServicoService.listarTodas().subscribe({
+        next: (ordens) => {
+          console.log('📦 Ordens recebidas:', ordens.length);
+          console.log('📊 Dados:', ordens);
+          
+          // Contar por status - usando strings
+          const porStatus = {
+            AGENDADO: ordens.filter(o => o.status === 'AGENDADO').length,
+            EM_ANDAMENTO: ordens.filter(o => o.status === 'EM_ANDAMENTO').length,
+            CONCLUIDO: ordens.filter(o => o.status === 'CONCLUIDO').length,
+            CANCELADO: ordens.filter(o => o.status === 'CANCELADO').length
+          };
+          
+          console.log('📊 Por status:', porStatus);
+          
+          this.ordens.set(ordens);
+          this.aplicarFiltro();
+          resolve();
+        },
+        error: (error) => {
+          console.error('❌ Erro ao carregar ordens:', error);
+          console.error('❌ Stack:', error.stack);
+          this.ordens.set([]);
+          this.ordensFiltradas.set([]);
+          resolve();
+        }
       });
     });
   }
@@ -279,9 +284,33 @@ export class OrdensServicoListaComponent implements OnInit {
   
   aplicarFiltro(): void {
     let filtradas = this.ordens();
+    
+    console.log('🔍 Aplicando filtro...');
+    console.log('  - Total de ordens:', filtradas.length);
+    console.log('  - Filtro de status:', this.filtroStatus());
+    console.log('  - Termo de busca:', this.searchTerm);
+    
+    // Filtrar por status
     if (this.filtroStatus() !== 'TODOS') {
       filtradas = filtradas.filter(o => o.status === this.filtroStatus());
+      console.log('  - Após filtro de status:', filtradas.length);
     }
+    
+    // Filtrar por busca
+    const termo = this.searchTerm.toLowerCase().trim();
+    if (termo) {
+      filtradas = filtradas.filter(ordem =>
+        ordem.nmCliente?.toLowerCase().includes(termo) ||
+        ordem.placaVeiculo?.toLowerCase().includes(termo) ||
+        ordem.modeloVeiculo?.toLowerCase().includes(termo) ||
+        ordem.nmMecanico?.toLowerCase().includes(termo) ||
+        ordem.diagnostico?.toLowerCase().includes(termo) ||
+        ordem.cdOrdemServico.toString().includes(termo)
+      );
+      console.log('  - Após busca:', filtradas.length);
+    }
+    
+    console.log('✅ Ordens filtradas:', filtradas.length);
     this.ordensFiltradas.set(filtradas);
   }
   
@@ -318,7 +347,7 @@ export class OrdensServicoListaComponent implements OnInit {
     return this.dropdownAbertoId() === ordemId;
   }
   
-  // ✅ CORRIGIDO: Lógica de mudança de status
+  // ✅ CORRIGIDO: Lógica de mudança de status com validações
   mudarStatus(ordem: OrdemServico, novoStatus: Status, event: Event): void {
     event.stopPropagation();
     this.dropdownAbertoId.set(null);
@@ -327,25 +356,48 @@ export class OrdensServicoListaComponent implements OnInit {
       return;
     }
     
-    // ✅ CONCLUIR: Abre modal de pagamento
-    if (novoStatus === Status.CONCLUIDO) {
+    // ❌ BLOQUEIO: Não permite mudar status de CONCLUIDO ou CANCELADO
+    if (ordem.status === 'CONCLUIDO') {
+      alert('⚠️ Ordens concluídas não podem ter o status alterado. O faturamento já foi gerado.');
+      return;
+    }
+    
+    if (ordem.status === 'CANCELADO') {
+      alert('⚠️ Ordens canceladas não podem ter o status alterado.');
+      return;
+    }
+    
+    // ✅ CONCLUIR: Abre modal de pagamento (apenas de EM_ANDAMENTO)
+    if (novoStatus === 'CONCLUIDO') {
+      if (ordem.status !== 'EM_ANDAMENTO') {
+        alert('⚠️ Só é possível concluir ordens que estão em andamento.');
+        return;
+      }
       this.abrirModalConcluir(ordem);
       return;
     }
     
     // ✅ INICIAR: De AGENDADO → EM_ANDAMENTO
-    if (novoStatus === Status.EM_ANDAMENTO && ordem.status === Status.AGENDADO) {
+    if (novoStatus === 'EM_ANDAMENTO') {
+      if (ordem.status !== 'AGENDADO') {
+        alert('⚠️ Só é possível iniciar ordens que estão aguardando.');
+        return;
+      }
       this.iniciarOrdem(ordem);
       return;
     }
     
-    // ✅ CANCELAR
-    if (novoStatus === Status.CANCELADO) {
+    // ✅ CANCELAR: Pode cancelar AGENDADO ou EM_ANDAMENTO
+    if (novoStatus === 'CANCELADO') {
+      if (ordem.status !== 'AGENDADO' && ordem.status !== 'EM_ANDAMENTO') {
+        alert('⚠️ Só é possível cancelar ordens aguardando ou em andamento.');
+        return;
+      }
       this.cancelarOrdem(ordem);
       return;
     }
     
-    alert('Esta mudança de status não é permitida.');
+    alert('⚠️ Esta mudança de status não é permitida.');
   }
   
   // ==================== AÇÕES DE STATUS ====================
@@ -557,12 +609,11 @@ export class OrdensServicoListaComponent implements OnInit {
     this.isSubmitting.set(true);
     const formValue = this.ordemForm.value;
     
-    // ✅ CORRIGIDO: Enviar vlUnitario
     const itensRequest: ItemOrdemServicoRequest[] = this.itens().map(item => ({
       cdProduto: item.tipo === 'produto' ? item.codigo : undefined,
       cdServico: item.tipo === 'servico' ? item.codigo : undefined,
       quantidade: item.quantidade,
-      vlUnitario: item.vlUnitario  // ✅ ADICIONADO
+      vlUnitario: item.vlUnitario
     }));
     
     const dados: OrdemServicoRequest = {
@@ -571,7 +622,7 @@ export class OrdensServicoListaComponent implements OnInit {
       cdMecanico: formValue.cdMecanico,
       tipoOrdemOrcamento: formValue.tipoOrdemOrcamento,
       dataAgendamento: formValue.dataAgendamento || undefined,
-      vlMaoObraExtra: parseFloat(formValue.vlMaoObraExtra) || undefined,  // ✅ ADICIONADO
+      vlMaoObraExtra: parseFloat(formValue.vlMaoObraExtra) || undefined,
       diagnostico: formValue.diagnostico || undefined,
       itens: itensRequest
     };
@@ -616,19 +667,46 @@ export class OrdensServicoListaComponent implements OnInit {
     
     const dataAgendamento = this.aprovarForm.get('dataAgendamento')?.value;
     
+    console.log('✅ Aprovando orçamento:', ordem.cdOrdemServico, 'Data:', dataAgendamento);
     this.isSubmitting.set(true);
     
     this.ordemServicoService.aprovarOrcamento(ordem.cdOrdemServico, dataAgendamento).subscribe({
       next: () => {
+        console.log('✅ Orçamento aprovado');
         this.isSubmitting.set(false);
         this.aprovarModalInstance?.hide();
         this.carregarOrdens();
-        alert('✅ Orçamento aprovado! Agendamento criado automaticamente.');
+        alert('✅ Orçamento aprovado! Transformado em Ordem de Serviço e agendamento criado automaticamente.');
       },
       error: (error) => {
-        console.error('Erro ao aprovar:', error);
+        console.error('❌ Erro ao aprovar:', error);
         this.isSubmitting.set(false);
         alert('❌ ' + (error.error?.message || 'Erro ao aprovar orçamento'));
+      }
+    });
+  }
+  
+  // ✅ NOVO: Excluir orçamento
+  excluirOrcamento(ordem: OrdemServico): void {
+    if (!confirm(`⚠️ Deseja realmente excluir este orçamento?\n\nCliente: ${ordem.nmCliente}\nTotal: ${this.formatarMoeda(ordem.vlTotal)}\n\nEsta ação não poderá ser desfeita.`)) {
+      return;
+    }
+    
+    console.log('🗑️ Excluindo orçamento:', ordem.cdOrdemServico);
+    this.isLoading.set(true);
+    
+    this.ordemServicoService.deletar(ordem.cdOrdemServico).subscribe({
+      next: () => {
+        console.log('✅ Orçamento excluído');
+        this.carregarOrdens().then(() => {
+          this.isLoading.set(false);
+          alert('✅ Orçamento excluído com sucesso!');
+        });
+      },
+      error: (error) => {
+        console.error('❌ Erro ao excluir:', error);
+        this.isLoading.set(false);
+        alert('❌ ' + (error.error?.message || 'Erro ao excluir orçamento'));
       }
     });
   }

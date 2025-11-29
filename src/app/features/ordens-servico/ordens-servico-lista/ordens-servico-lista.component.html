@@ -19,6 +19,35 @@
   <!-- Filtros de Status -->
   <div class="filters-bar card">
     <div class="card-body">
+      <!-- ✅ BARRA DE BUSCA -->
+      <div class="row g-3 mb-3">
+        <div class="col-12">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Buscar por cliente, veículo, mecânico, diagnóstico ou número da OS..."
+              [(ngModel)]="searchTerm"
+              (ngModelChange)="aplicarFiltro()"
+            />
+            @if (searchTerm) {
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                (click)="searchTerm = ''; aplicarFiltro()"
+                title="Limpar busca"
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+      
+      <!-- Filtros de Status -->
       <div class="status-filters">
         @for (status of statusOptions; track status.value) {
           <button
@@ -57,6 +86,7 @@
             <table class="table table-hover mb-0">
               <thead>
                 <tr>
+                  <th>Nº</th>
                   <th>DATA</th>
                   <th>CLIENTE</th>
                   <th>VEÍCULO</th>
@@ -69,6 +99,16 @@
               <tbody>
                 @for (ordem of ordensFiltradas(); track ordem.cdOrdemServico) {
                   <tr>
+                    <!-- ✅ MELHORADO: Mostra #OC para orçamento e #OS para ordem -->
+                    <td>
+                      <strong class="text-primary">
+                        @if (ordem.tipoOrdemOrcamento === 'ORCAMENTO') {
+                          #OC{{ ordem.cdOrdemServico }}
+                        } @else {
+                          #OS{{ ordem.cdOrdemServico }}
+                        }
+                      </strong>
+                    </td>
                     <td>
                       <small>{{ formatarDataHora(ordem.dataAbertura) }}</small>
                     </td>
@@ -78,11 +118,18 @@
                       <br>
                       <small class="text-muted">{{ ordem.modeloVeiculo || '-' }}</small>
                     </td>
+                    <!-- ✅ MELHORADO: Badge de tipo mais claro com ícone -->
                     <td>
                       @if (ordem.tipoOrdemOrcamento === 'ORCAMENTO') {
-                        <span class="badge bg-info">ORÇAMENTO</span>
+                        <span class="badge bg-warning text-dark">
+                          <i class="bi bi-file-text me-1"></i>
+                          OC
+                        </span>
                       } @else {
-                        <span class="badge bg-primary">OS</span>
+                        <span class="badge bg-primary">
+                          <i class="bi bi-file-earmark-check me-1"></i>
+                          OS
+                        </span>
                       }
                     </td>
                     <!-- ✅ Dropdown de Status Clicável -->
@@ -122,27 +169,60 @@
                       <strong class="text-success">{{ formatarMoeda(ordem.vlTotal) }}</strong>
                     </td>
                     <td class="text-center">
-                      <div class="btn-group btn-group-sm">
-                        <!-- Editar -->
-                        @if (ordem.status === 'AGENDADO') {
-                          <button
-                            class="btn btn-outline-info"
-                            (click)="abrirModalEditar(ordem)"
-                            title="Editar"
-                          >
-                            <i class="bi bi-pencil"></i>
-                          </button>
+                      <div class="btn-group btn-group-sm" role="group">
+                        <!-- ✅ ORÇAMENTO: Botão de Aprovar Verde e Destaque -->
+                        @if (ordem.tipoOrdemOrcamento === 'ORCAMENTO') {
+                          @if (!ordem.aprovado) {
+                            <button
+                              class="btn btn-success"
+                              (click)="abrirModalAprovar(ordem)"
+                              title="Aprovar Orçamento e Transformar em OS"
+                            >
+                              <i class="bi bi-check-circle me-1"></i>
+                              Aprovar
+                            </button>
+                            <button
+                              class="btn btn-outline-danger"
+                              (click)="excluirOrcamento(ordem)"
+                              title="Excluir Orçamento"
+                            >
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          } @else {
+                            <span class="badge bg-success px-3 py-2">
+                              <i class="bi bi-check-circle me-1"></i>
+                              Aprovado
+                            </span>
+                          }
                         }
                         
-                        <!-- Aprovar Orçamento -->
-                        @if (ordem.tipoOrdemOrcamento === 'ORCAMENTO' && ordem.status === 'AGENDADO' && !ordem.aprovado) {
-                          <button
-                            class="btn btn-outline-success"
-                            (click)="abrirModalAprovar(ordem)"
-                            title="Aprovar Orçamento"
-                          >
-                            <i class="bi bi-check-circle"></i>
-                          </button>
+                        <!-- ✅ ORDEM DE SERVIÇO: Editar apenas se AGENDADO -->
+                        @if (ordem.tipoOrdemOrcamento === 'ORDEM_DE_SERVICO') {
+                          @if (ordem.status === 'AGENDADO') {
+                            <button
+                              class="btn btn-outline-info"
+                              (click)="abrirModalEditar(ordem)"
+                              title="Editar"
+                            >
+                              <i class="bi bi-pencil me-1"></i>
+                              Editar
+                            </button>
+                          } @else if (ordem.status === 'CONCLUIDO') {
+                            <span class="badge bg-success px-3 py-2">
+                              <i class="bi bi-check-circle-fill me-1"></i>
+                              Concluída
+                            </span>
+                          } @else if (ordem.status === 'CANCELADO') {
+                            <span class="badge bg-secondary px-3 py-2">
+                              <i class="bi bi-x-circle-fill me-1"></i>
+                              Cancelada
+                            </span>
+                          } @else if (ordem.status === 'EM_ANDAMENTO') {
+                            <span class="badge bg-primary px-3 py-2">
+                              <i class="bi bi-play-circle-fill me-1"></i>
+                              Em Execução
+                            </span>
+                          }
                         }
                       </div>
                     </td>
@@ -155,7 +235,7 @@
           <!-- Rodapé com Total -->
           <div class="table-footer">
             <span class="text-muted">
-              Total: <strong>{{ ordensFiltradas().length }}</strong> ordem(ns)
+              Total: <strong>{{ ordensFiltradas().length }}</strong> registro(s)
             </span>
           </div>
         }
@@ -165,7 +245,7 @@
 </div>
 
 <!-- ========================================== -->
-<!-- MODAL DE CRIAR ORDEM -->
+<!-- MODAL DE CRIAR ORDEM/ORÇAMENTO -->
 <!-- ========================================== -->
 <div class="modal fade" #ordemModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
@@ -173,7 +253,11 @@
       <div class="modal-header">
         <h5 class="modal-title">
           <i class="bi bi-file-earmark-plus me-2"></i>
-          Nova Ordem de Serviço
+          @if (ordemForm.get('tipoOrdemOrcamento')?.value === 'ORCAMENTO') {
+            Novo Orçamento
+          } @else {
+            Nova Ordem de Serviço
+          }
         </h5>
         <button type="button" class="btn-close" (click)="fecharModal()"></button>
       </div>
@@ -188,7 +272,7 @@
               </h6>
             </div>
             
-            <!-- ✅ CORRIGIDO: tipoOrdemOrcamento -->
+            <!-- ✅ TIPO: Orçamento ou Ordem de Serviço -->
             <div class="col-md-3">
               <label for="tipoOrdemOrcamento" class="form-label">
                 Tipo <span class="text-danger">*</span>
@@ -202,6 +286,15 @@
                   <option [value]="tipo.value">{{ tipo.label }}</option>
                 }
               </select>
+              <small class="text-muted">
+                @if (ordemForm.get('tipoOrdemOrcamento')?.value === 'ORCAMENTO') {
+                  <i class="bi bi-info-circle me-1"></i>
+                  Orçamento pode ser aprovado depois
+                } @else {
+                  <i class="bi bi-check-circle me-1"></i>
+                  Ordem de Serviço precisa de agendamento
+                }
+              </small>
             </div>
             
             <div class="col-md-3">
@@ -268,6 +361,13 @@
                 id="dataAgendamento"
                 formControlName="dataAgendamento"
               />
+              <small class="text-muted">
+                @if (ordemForm.get('tipoOrdemOrcamento')?.value === 'ORCAMENTO') {
+                  Opcional para orçamento
+                } @else {
+                  Obrigatório para ordem de serviço
+                }
+              </small>
             </div>
             
             <!-- Produtos -->
@@ -434,7 +534,7 @@
               } @else {
                 <div class="alert alert-info">
                   <i class="bi bi-info-circle me-2"></i>
-                  Adicione produtos e/ou serviços à ordem
+                  Adicione produtos e/ou serviços
                 </div>
               }
             </div>
@@ -472,7 +572,11 @@
               Salvando...
             } @else {
               <i class="bi bi-check-circle me-2"></i>
-              Criar Ordem
+              @if (ordemForm.get('tipoOrdemOrcamento')?.value === 'ORCAMENTO') {
+                Criar Orçamento
+              } @else {
+                Criar Ordem
+              }
             }
           </button>
         </div>
@@ -482,24 +586,44 @@
 </div>
 
 <!-- ========================================== -->
-<!-- MODAL DE APROVAÇÃO -->
+<!-- ✅ MODAL DE APROVAÇÃO DE ORÇAMENTO -->
 <!-- ========================================== -->
 <div class="modal fade" #aprovarModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header bg-success text-white">
         <h5 class="modal-title">
           <i class="bi bi-check-circle me-2"></i>
           Aprovar Orçamento
         </h5>
-        <button type="button" class="btn-close" (click)="aprovarModalInstance?.hide()"></button>
+        <button type="button" class="btn-close btn-close-white" (click)="aprovarModalInstance?.hide()"></button>
       </div>
       
       <form [formGroup]="aprovarForm" (ngSubmit)="aprovarOrcamento()">
         <div class="modal-body">
-          <p class="text-muted mb-3">
-            Ao aprovar este orçamento, ele será transformado em Ordem de Serviço e será criado um agendamento automaticamente.
-          </p>
+          @if (ordemParaAprovar(); as ordem) {
+            <div class="alert alert-info mb-3">
+              <h6 class="alert-heading">
+                <i class="bi bi-file-text me-2"></i>
+                Orçamento #OC{{ ordem.cdOrdemServico }}
+              </h6>
+              <hr>
+              <p class="mb-1"><strong>Cliente:</strong> {{ ordem.nmCliente }}</p>
+              <p class="mb-1"><strong>Veículo:</strong> {{ ordem.placaVeiculo }} - {{ ordem.modeloVeiculo }}</p>
+              <p class="mb-0"><strong>Total:</strong> <span class="text-success fw-bold">{{ formatarMoeda(ordem.vlTotal) }}</span></p>
+            </div>
+          }
+          
+          <div class="alert alert-warning">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>O que acontecerá ao aprovar:</strong>
+            <ul class="mb-0 mt-2">
+              <li>Orçamento será transformado em <strong>Ordem de Serviço</strong></li>
+              <li>Um <strong>agendamento</strong> será criado automaticamente</li>
+              <li>Status será alterado para <strong>AGENDADO</strong></li>
+              <li>Orçamento ficará marcado como <strong>aprovado</strong></li>
+            </ul>
+          </div>
           
           <div class="mb-3">
             <label for="dataAgendamentoAprovar" class="form-label">
@@ -507,19 +631,15 @@
             </label>
             <input
               type="date"
-              class="form-control"
+              class="form-control form-control-lg"
               id="dataAgendamentoAprovar"
               formControlName="dataAgendamento"
             />
+            <small class="text-muted">
+              <i class="bi bi-calendar-event me-1"></i>
+              Selecione a data para realizar o serviço
+            </small>
           </div>
-          
-          @if (ordemParaAprovar()) {
-            <div class="alert alert-info">
-              <strong>Cliente:</strong> {{ ordemParaAprovar()?.nmCliente }}<br>
-              <strong>Veículo:</strong> {{ ordemParaAprovar()?.placaVeiculo }}<br>
-              <strong>Total:</strong> {{ formatarMoeda(ordemParaAprovar()!.vlTotal) }}
-            </div>
-          }
         </div>
         
         <div class="modal-footer">
@@ -533,15 +653,15 @@
           </button>
           <button
             type="submit"
-            class="btn btn-success"
-            [disabled]="isSubmitting()"
+            class="btn btn-success btn-lg"
+            [disabled]="isSubmitting() || aprovarForm.invalid"
           >
             @if (isSubmitting()) {
               <span class="spinner-border spinner-border-sm me-2"></span>
               Aprovando...
             } @else {
               <i class="bi bi-check-circle me-2"></i>
-              Aprovar Orçamento
+              Aprovar e Criar OS
             }
           </button>
         </div>
@@ -575,7 +695,7 @@
             </div>
           }
           
-          <!-- ✅ MÃO DE OBRA EXTRA -->d
+          <!-- ✅ MÃO DE OBRA EXTRA -->
           <div class="mb-3">
             <label for="editVlMaoObraExtra" class="form-label">
               Mão de Obra Extra (R$)
