@@ -159,7 +159,7 @@ export interface Venda {
   clienteModel?: {             // ✅ Backend usa "clienteModel"
     cdCliente: number;
     nmCliente: string;
-    CPF?: string;
+    cpf?: string;
     Telefone?: string;
     email?: string;
   };
