@@ -35,9 +35,9 @@ export class ProdutosListaComponent implements OnInit {
       nmProduto: ['', [Validators.required, Validators.maxLength(150)]],
       dsProduto: ['', [Validators.maxLength(500)]],
       categoria: ['', [Validators.maxLength(100)]],
-      vlProduto: [null, [Validators.required, Validators.min(0.01)]],  // ✅ ÚNICO CAMPO DE VALOR
+      vlProduto: [null, [Validators.required, Validators.min(0.01)]],  
       qtdEstoque: [0, [Validators.required, Validators.min(0)]],
-      qtdMinimo: [5, [Validators.required, Validators.min(0)]]  // ✅ CORRIGIDO: qtdMinimo
+      qtdMinimo: [5, [Validators.required, Validators.min(0)]]  
     });
   }
   
@@ -77,9 +77,9 @@ export class ProdutosListaComponent implements OnInit {
       nmProduto: produto.nmProduto,
       dsProduto: produto.dsProduto,
       categoria: produto.categoria,
-      vlProduto: produto.vlProduto,  // ✅ ÚNICO VALOR
+      vlProduto: produto.vlProduto,  
       qtdEstoque: produto.qtdEstoque,
-      qtdMinimo: produto.qtdMinimoEstoque  // ✅ CORRIGIDO
+      qtdMinimo: produto.qtdMinimoEstoque  
     });
     
     this.erro = '';
@@ -99,9 +99,9 @@ export class ProdutosListaComponent implements OnInit {
       nmProduto: this.produtoForm.value.nmProduto,
       dsProduto: this.produtoForm.value.dsProduto || undefined,
       categoria: this.produtoForm.value.categoria || undefined,
-      vlProduto: this.produtoForm.value.vlProduto,  // ✅ ÚNICO VALOR
+      vlProduto: this.produtoForm.value.vlProduto,  
       qtdEstoque: this.produtoForm.value.qtdEstoque,
-      qtdMinimoEstoque: this.produtoForm.value.qtdMinimo  // ✅ CORRIGIDO
+      qtdMinimoEstoque: this.produtoForm.value.qtdMinimo  
     };
     
     const operacao = this.modoEdicao && this.produtoEditando
@@ -153,6 +153,6 @@ export class ProdutosListaComponent implements OnInit {
   }
   
   contarEstoqueBaixo(): number {
-    return this.produtos.filter(p => p.qtdEstoque <= p.qtdMinimoEstoque).length;  // ✅ CORRIGIDO
+    return this.produtos.filter(p => p.qtdEstoque <= p.qtdMinimoEstoque).length;  
   }
 }

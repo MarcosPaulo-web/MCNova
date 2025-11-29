@@ -1,7 +1,5 @@
-<!-- src/app/features/produtos/produtos-lista/produtos-lista.component.html -->
-
 <div class="produtos-page">
-  <!-- Cabeçalho -->
+  
   <div class="page-header">
     <div>
       <h2>
@@ -55,7 +53,7 @@
                   <th>Código</th>
                   <th>Produto</th>
                   <th>Categoria</th>
-                  <th>Preço</th> <!-- ✅ SIMPLIFICADO -->
+                  <th>Preço</th> 
                   <th>Estoque</th>
                   <th>Mín.</th>
                   <th>Status</th>
@@ -85,7 +83,7 @@
                       }
                     </td>
                     <td>
-                      <!-- ✅ APENAS UM PREÇO -->
+                   
                       <strong class="text-success">R$ {{ produto.vlProduto.toFixed(2) }}</strong>
                     </td>
                     <td>
@@ -98,7 +96,7 @@
                       </span>
                     </td>
                     <td>
-                      <!-- ✅ CORRIGIDO: qtdMinimo -->
+                      
                       <span class="text-muted">{{ produto.qtdMinimoEstoque }}</span>
                     </td>
                     <td>
@@ -243,7 +241,7 @@
                 </small>
               </div>
               
-              <!-- ✅ ÚNICO CAMPO DE PREÇO -->
+            
               <div class="col-md-12">
                 <label for="vlProduto" class="form-label">
                   Preço do Produto (R$) <span class="text-danger">*</span>
@@ -269,7 +267,6 @@
                 <small class="form-text text-muted">Preço de venda do produto</small>
               </div>
               
-              <!-- Quantidade em Estoque -->
               <div class="col-md-6">
                 <label for="qtdEstoque" class="form-label">
                   Quantidade em Estoque <span class="text-danger">*</span>

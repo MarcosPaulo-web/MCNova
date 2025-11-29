@@ -1,4 +1,4 @@
-// src/app/core/services/ordem-servico.service.ts
+
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -12,7 +12,7 @@ export class OrdemServicoService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/ordens-servico`;
   
-  // ==================== CRUD ====================
+  
   
   criar(data: OrdemServicoRequest): Observable<OrdemServico> {
     console.log('📤 POST /ordens-servico:', data);
@@ -24,11 +24,10 @@ export class OrdemServicoService {
   }
   
   atualizar(id: number, data: OrdemServicoRequest): Observable<OrdemServico> {
-    console.log(`📤 PUT /ordens-servico/${id}:`, data);
+    console.log(`PUT /ordens-servico/${id}:`, data);
     return this.http.put<OrdemServico>(`${this.apiUrl}/${id}`, data);
   }
   
-  // ✅ NOVO: Atualização parcial - apenas diagnóstico e mão de obra
   atualizarDiagnosticoEMaoObra(
     id: number, 
     diagnostico: string, 
@@ -38,7 +37,7 @@ export class OrdemServicoService {
       diagnostico,
       vlMaoObraExtra
     };
-    console.log(`📤 PATCH /ordens-servico/${id}/diagnostico-e-mao-obra:`, dados);
+    console.log(`PATCH /ordens-servico/${id}/diagnostico-e-mao-obra:`, dados);
     return this.http.patch<OrdemServico>(
       `${this.apiUrl}/${id}/diagnostico-e-mao-obra`, 
       dados
@@ -46,11 +45,11 @@ export class OrdemServicoService {
   }
   
   deletar(id: number): Observable<void> {
-    console.log(`🗑️ DELETE /ordens-servico/${id}`);
+    console.log(`DELETE /ordens-servico/${id}`);
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
   
-  // ==================== LISTAGENS ====================
+ 
   
   listarTodas(): Observable<OrdemServico[]> {
     console.log('📡 GET /ordens-servico (TODAS)');
@@ -58,35 +57,33 @@ export class OrdemServicoService {
   }
   
   listarPorStatus(status: Status): Observable<OrdemServico[]> {
-    console.log(`📡 GET /ordens-servico/status/${status}`);
+    console.log(`GET /ordens-servico/status/${status}`);
     return this.http.get<OrdemServico[]>(`${this.apiUrl}/status/${status}`);
   }
   
   listarOrcamentosPendentes(): Observable<OrdemServico[]> {
-    console.log('📡 GET /ordens-servico/orcamentos/pendentes');
+    console.log('GET /ordens-servico/orcamentos/pendentes');
     return this.http.get<OrdemServico[]>(`${this.apiUrl}/orcamentos/pendentes`);
   }
   
-  // ==================== AÇÕES ====================
-  // ✅ CORRIGIDO: Usar PATCH ao invés de POST
   
   iniciar(id: number): Observable<OrdemServico> {
-    console.log(`▶️ PATCH /ordens-servico/${id}/iniciar`);
+    console.log(`PATCH /ordens-servico/${id}/iniciar`);
     return this.http.patch<OrdemServico>(`${this.apiUrl}/${id}/iniciar`, {});
   }
   
   concluir(id: number, formaPagamento: FormaPagamento): Observable<OrdemServico> {
-    console.log(`✅ PATCH /ordens-servico/${id}/concluir, Pagamento:`, formaPagamento);
+    console.log(`PATCH /ordens-servico/${id}/concluir, Pagamento:`, formaPagamento);
     return this.http.patch<OrdemServico>(`${this.apiUrl}/${id}/concluir`, { formaPagamento });
   }
   
   cancelar(id: number): Observable<void> {
-    console.log(`❌ PATCH /ordens-servico/${id}/cancelar`);
+    console.log(`PATCH /ordens-servico/${id}/cancelar`);
     return this.http.patch<void>(`${this.apiUrl}/${id}/cancelar`, {});
   }
   
   aprovarOrcamento(id: number, dataAgendamento: string): Observable<OrdemServico> {
-    console.log(`✅ PATCH /ordens-servico/${id}/aprovar-orcamento, Data:`, dataAgendamento);
+    console.log(`PATCH /ordens-servico/${id}/aprovar-orcamento, Data:`, dataAgendamento);
     return this.http.patch<OrdemServico>(`${this.apiUrl}/${id}/aprovar-orcamento`, { dataAgendamento });
   }
 }

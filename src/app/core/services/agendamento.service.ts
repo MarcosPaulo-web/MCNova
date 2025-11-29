@@ -11,7 +11,6 @@ export class AgendamentoService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/agendamentos`;
 
-  // ==================== CRUD ====================
   
   criar(data: AgendamentoRequest): Observable<Agendamento> {
     return this.http.post<Agendamento>(this.apiUrl, data);
@@ -37,12 +36,10 @@ export class AgendamentoService {
     return this.http.put<Agendamento>(`${this.apiUrl}/${id}`, data);
   }
 
-  // ✅ ATUALIZAR STATUS (sincroniza com OS automaticamente no backend)
   atualizarStatus(id: number, status: Status): Observable<Agendamento> {
     return this.http.patch<Agendamento>(`${this.apiUrl}/${id}/status`, { status });
   }
 
-  // ✅ CANCELAR
   cancelar(id: number): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/cancelar`, {});
   }

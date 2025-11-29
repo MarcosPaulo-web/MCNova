@@ -56,10 +56,10 @@ export class LoginComponent {
         console.log('👤 Usuário:', response.usuario);
         
         this.isLoading.set(false);
-        // AuthService já redireciona para dashboard
+     
       },
       error: (error) => {
-        console.error('❌ Erro no login:', error);
+        console.error('Erro no login:', error);
         this.isLoading.set(false);
         this.errorMessage.set(
           error.message || 'Email ou senha incorretos. Tente novamente.'

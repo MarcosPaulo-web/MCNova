@@ -21,7 +21,6 @@ export class AuthService {
   
   constructor() {}
   
-  // Login com email e senha
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials)
       .pipe(
@@ -29,18 +28,15 @@ export class AuthService {
       );
   }
   
-  // Registro de novo usuario
   register(data: UsuarioRequest): Observable<Usuario> {
     return this.http.post<Usuario>(`${environment.apiUrl}/auth/register`, data);
   }
-  
-  // Login com Google - redireciona para backend OAuth2
+
   loginWithGoogle(): void {
     const googleAuthUrl = `${environment.apiUrl.replace('/api', '')}/oauth2/authorization/google`;
     window.location.href = googleAuthUrl;
   }
   
-  // Callback do Google - processa token recebido
   handleGoogleCallback(token: string): void {
     this.http.get<Usuario>(`${environment.apiUrl}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -62,7 +58,6 @@ export class AuthService {
     });
   }
   
-  // Logout
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
@@ -70,33 +65,28 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
   
-  // Obter usuario atual
   getCurrentUser(): Usuario | null {
     return this.currentUserSubject.value;
   }
   
-  // Obter token JWT
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
   
-  // Verificar se esta autenticado
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
   
-  // Verificar se tem role especifica
   hasRole(role: string): boolean {
     const user = this.getCurrentUser();
     return user?.roles?.includes(role as any) || false;
   }
   
-  // Verificar se tem alguma das roles
+
   hasAnyRole(roles: string[]): boolean {
     return roles.some(role => this.hasRole(role));
   }
   
-  // Processar sucesso da autenticacao
   private handleAuthSuccess(response: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, response.accessToken);
     localStorage.setItem(this.USER_KEY, JSON.stringify(response.usuario));
@@ -104,7 +94,6 @@ export class AuthService {
     this.router.navigate(['/dashboard']);
   }
   
-  // Recuperar usuario do localStorage
   private getUserFromStorage(): Usuario | null {
     const userJson = localStorage.getItem(this.USER_KEY);
     return userJson ? JSON.parse(userJson) : null;

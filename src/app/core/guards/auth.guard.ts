@@ -10,7 +10,6 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
   
-  // Redireciona para login se não autenticado
   router.navigate(['/auth/login'], { 
     queryParams: { returnUrl: state.url } 
   });

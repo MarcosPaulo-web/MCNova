@@ -1,6 +1,3 @@
-// src/app/core/utils/formatters.util.ts
-// Funcao formatarData estava faltando
-
 export function formatarDataSimples(dataISO: string): string {
   if (!dataISO) return '';
   
@@ -23,7 +20,6 @@ export function dataParaISO(dataBR: string): string {
   return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
 }
 
-// Adicionar esta funcao que esta sendo usada no cliente
 export function formatarData(dataISO: string): string {
   return formatarDataSimples(dataISO);
 }

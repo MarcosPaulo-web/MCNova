@@ -1,4 +1,3 @@
-// Enums correspondentes ao backend
 
 export enum UserRole {
   ROLE_ADMIN = 'ROLE_ADMIN',
@@ -18,7 +17,6 @@ export enum FormaPagamento {
   PIX = 'PIX'
 }
 
-// ✅ CORRIGIDO: Status usado tanto em Agendamento quanto em OrdemServico
 export enum Status {
   AGENDADO = 'AGENDADO',
   EM_ANDAMENTO = 'EM_ANDAMENTO',

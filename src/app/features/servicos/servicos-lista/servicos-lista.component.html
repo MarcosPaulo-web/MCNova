@@ -1,5 +1,5 @@
 <div class="servicos-page">
-  <!-- Cabeçalho -->
+  
   <div class="page-header">
     <div>
       <h2>
@@ -33,7 +33,7 @@
     </div>
   </div>
 
-  <!-- Loading State -->
+  
   @if (isLoading()) {
   <div class="text-center py-5">
     <div class="spinner-border text-primary" role="status">
@@ -42,7 +42,7 @@
     <p class="text-muted mt-2">Carregando serviços...</p>
   </div>
   } @else {
-  <!-- Tabela de Serviços -->
+  
   <div class="card">
     <div class="card-body p-0">
       @if (servicosFiltrados().length === 0) {
@@ -103,7 +103,7 @@
         </table>
       </div>
 
-      <!-- Rodapé com Total -->
+     
       <div class="table-footer">
         <span class="text-muted">
           Total: <strong>{{ servicosFiltrados().length }}</strong> serviço(s)
@@ -115,7 +115,7 @@
   }
 </div>
 
-<!-- Modal de Serviço -->
+
 <div class="modal fade" #servicoModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -137,7 +137,7 @@
       <form [formGroup]="servicoForm" (ngSubmit)="salvar()">
         <div class="modal-body">
           <div class="row g-3">
-            <!-- Nome do Serviço -->
+          
             <div class="col-12">
               <label for="nmServico" class="form-label">
                 Nome do Serviço <span class="text-danger">*</span>
@@ -157,7 +157,7 @@
               }
             </div>
 
-            <!-- Descrição -->
+        
             <div class="col-12">
               <label for="dsServico" class="form-label">Descrição</label>
               <textarea
@@ -175,7 +175,7 @@
               }
             </div>
 
-            <!-- Valor -->
+          
             <div class="col-12">
               <label for="vlServico" class="form-label">
                 Valor (R$) <span class="text-danger">*</span>

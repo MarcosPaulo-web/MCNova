@@ -111,7 +111,7 @@ export class AgendamentosListaComponent implements OnInit {
     });
   }
   
-  // ✅ CORRIGIDO: Método separado sem finally
+ 
   carregarAgendamentos(): Promise<void> {
     return new Promise((resolve) => {
       this.agendamentoService.listarTodos().subscribe({
@@ -124,7 +124,7 @@ export class AgendamentosListaComponent implements OnInit {
             });
             this.agendamentos.set(agendamentosOrdenados);
           } else {
-            console.error('❌ Resposta não é um array:', agendamentos);
+            console.error('Resposta não é um array:', agendamentos);
             this.agendamentos.set([]);
           }
           
@@ -132,7 +132,7 @@ export class AgendamentosListaComponent implements OnInit {
           resolve();
         },
         error: (error) => {
-          console.error('❌ Erro ao carregar agendamentos:', error);
+          console.error('Erro ao carregar agendamentos:', error);
           alert('Erro ao carregar agendamentos: ' + (error.message || 'Erro desconhecido'));
           this.agendamentos.set([]);
           resolve();
@@ -240,7 +240,6 @@ export class AgendamentosListaComponent implements OnInit {
     return this.dropdownAbertoId() === agendamentoId;
   }
   
-  // ✅ CORRIGIDO: Gerenciamento correto do loading
   mudarStatus(agendamento: Agendamento, novoStatus: Status, event: Event): void {
     event.stopPropagation();
     this.dropdownAbertoId.set(null);
@@ -265,18 +264,18 @@ export class AgendamentosListaComponent implements OnInit {
     
     this.agendamentoService.atualizarStatus(agendamento.cdAgendamento, novoStatus).subscribe({
       next: () => {
-        console.log('✅ Status atualizado com sucesso');
+        console.log('Status atualizado com sucesso');
         
-        // ✅ CORRIGIDO: Atualizar apenas os agendamentos e desligar loading depois
+      
         this.carregarAgendamentos().then(() => {
           this.isLoading.set(false);
-          alert('✅ Status atualizado com sucesso! A Ordem de Serviço foi sincronizada automaticamente.');
+          alert('Status atualizado com sucesso! A Ordem de Serviço foi sincronizada automaticamente.');
         });
       },
       error: (error) => {
-        console.error('❌ Erro ao atualizar status:', error);
+        console.error('Erro ao atualizar status:', error);
         this.isLoading.set(false);
-        alert('❌ ' + (error.message || 'Erro ao atualizar status do agendamento'));
+        alert(' ' + (error.message || 'Erro ao atualizar status do agendamento'));
       }
     });
   }
@@ -347,7 +346,6 @@ export class AgendamentosListaComponent implements OnInit {
         this.isSubmitting.set(false);
         this.fecharModal();
         
-        // ✅ Recarregar agendamentos sem mostrar loading global
         this.carregarAgendamentos();
         
         alert(this.modoEdicao() ? 'Agendamento atualizado com sucesso!' : 'Agendamento criado com sucesso!');

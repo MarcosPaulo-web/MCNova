@@ -11,7 +11,6 @@ export class ClienteService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/clientes`;
   
-  // ==================== CRUD ====================
   criar(data: ClienteRequest): Observable<Cliente> {
     return this.http.post<Cliente>(this.apiUrl, data);
   }

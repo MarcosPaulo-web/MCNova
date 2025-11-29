@@ -1,36 +1,27 @@
-// ========================================
-// src/app/core/models/models-extended.ts
-// VERSÃO CORRIGIDA - Compatível com o Backend
-// ========================================
-
 import { FormaPagamento, Status, TipoOrdemOrcamento } from './enums';
 
-// ==================== AGENDAMENTO ====================
+
 export interface Agendamento {
   cdAgendamento: number;
   
-  // Cliente
+
   cdCliente: number;
   nmCliente: string;
   cpfCliente: string;
   telefoneCliente: string;
   
-  // Veículo
   cdVeiculo: number;
   placaVeiculo: string;
   modeloVeiculo: string;
   marcaVeiculo: string;
   
-  // Mecânico
   cdMecanico: number;
   nmMecanico: string;
   
-  // Agendamento
   dataAgendamento: string;
   status: Status;
   observacoes?: string;
   
-  // Ordem de Serviço vinculada
   cdOrdemServico?: number;
 }
 
@@ -42,8 +33,6 @@ export interface AgendamentoRequest {
   observacoes?: string;
 }
 
-// ==================== PRODUTO ====================
-// ==================== PRODUTO ====================
 export interface Produto {
   cdProduto: number;
   nmProduto: string;
@@ -64,7 +53,7 @@ export interface ProdutoRequest {
   qtdMinimoEstoque: number;   
 }
 
-// ==================== SERVICO ====================
+
 export interface Servico {
   cdServico: number;
   nmServico: string;
@@ -79,31 +68,29 @@ export interface ServicoRequest {
   vlServico: number;
 }
 
-// ==================== ORDEM DE SERVICO ====================
+
 export interface OrdemServico {
   cdOrdemServico: number;
   
-  // Cliente
+
   cdCliente: number;
   nmCliente: string;
   
-  // Veículo
+
   cdVeiculo: number;
   placaVeiculo: string;
   modeloVeiculo: string;
   marcaVeiculo: string;
   
-  // Mecânico
   cdMecanico: number;
   nmMecanico: string;
   
-  // Dados da OS
   tipoOrdemOrcamento: TipoOrdemOrcamento;
   status: Status;
   dataAgendamento: string;
   dataAbertura: string;
   
-  // Valores
+
   vlPecas: number;
   vlServicos: number;
   vlMaoObraExtra: number;
@@ -126,7 +113,6 @@ export interface OrdemServicoRequest {
   itens: ItemOrdemServicoRequest[];
 }
 
-// ==================== ITEM ORDEM DE SERVICO ====================
 export interface ItemOrdemServico {
   cdItem: number;
   cdProduto?: number;
@@ -146,17 +132,15 @@ export interface ItemOrdemServicoRequest {
   
 }
 
-// ==================== VENDA ====================
-// ✅ CORRIGIDO: Interface compatível com o backend
 export interface Venda {
   cdVenda: number;
-  dataVenda: string;           // ✅ LocalDateTime no backend
+  dataVenda: string;          
   vlTotal: number;
   desconto?: number;
   formaPagamento: FormaPagamento;
   
-  // ✅ CORRIGIDO: Backend retorna objetos aninhados
-  clienteModel?: {             // ✅ Backend usa "clienteModel"
+ 
+  clienteModel?: {            
     cdCliente: number;
     nmCliente: string;
     cpf?: string;
@@ -164,7 +148,7 @@ export interface Venda {
     email?: string;
   };
   
-  atendente?: {                // ✅ Backend usa "atendente"
+  atendente?: {                
     cdUsuario: number;
     nmUsuario: string;
     email?: string;
@@ -174,14 +158,14 @@ export interface Venda {
 }
 
 export interface VendaRequest {
-  cdCliente: number;           // ✅ Obrigatório no backend
+  cdCliente: number;         
   cdAtendente: number;
   desconto?: number;
   formaPagamento: FormaPagamento;
   itens: ItemVendaRequest[];
 }
 
-// ==================== ITEM VENDA ====================
+
 export interface ItemVenda {
   cdItemVenda: number;
   cdProduto: number;
@@ -189,7 +173,7 @@ export interface ItemVenda {
   vlUnitario: number;
   vlTotal: number;
   
-  // ✅ Produto aninhado (se o backend retornar)
+
   produto?: {
     cdProduto: number;
     nmProduto: string;
@@ -200,10 +184,10 @@ export interface ItemVenda {
 export interface ItemVendaRequest {
   cdProduto: number;
   quantidade: number;
-  // ✅ vlUnitario não é necessário no request - backend calcula
+ 
 }
 
-// ==================== FATURAMENTO ====================
+
 export interface Faturamento {
   cdFaturamento: number;
   cdVenda?: number;

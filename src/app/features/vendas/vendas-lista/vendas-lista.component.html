@@ -1,6 +1,6 @@
-<!-- src/app/features/vendas/vendas-lista/vendas-lista.component.html -->
+
 <div class="vendas-page">
-  <!-- Cabeçalho -->
+ 
   <div class="page-header">
     <div>
       <h2>
@@ -16,7 +16,6 @@
     </button>
   </div>
   
-  <!-- Barra de Busca -->
   <div class="search-bar card">
     <div class="card-body">
       <div class="input-group">
@@ -44,7 +43,6 @@
     </div>
   </div>
   
-  <!-- Loading State -->
   @if (isLoading()) {
     <div class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
@@ -53,7 +51,7 @@
       <p class="text-muted mt-2">Carregando vendas...</p>
     </div>
   } @else {
-    <!-- Tabela de Vendas -->
+
     <div class="card">
       <div class="card-body">
         @if (vendasFiltradas().length === 0) {
@@ -141,7 +139,6 @@
             </table>
           </div>
           
-          <!-- Rodapé com Total -->
           <div class="table-footer">
             <div class="row align-items-center">
               <div class="col-md-6">
@@ -163,9 +160,6 @@
   }
 </div>
 
-<!-- ========================================== -->
-<!-- MODAL DE NOVA VENDA -->
-<!-- ========================================== -->
 <div class="modal fade" #vendaModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
@@ -181,7 +175,7 @@
         <div class="modal-body">
           <div class="row g-3">
             
-            <!-- Informações Básicas -->
+         
             <div class="col-12">
               <h6 class="section-title">
                 <i class="bi bi-info-circle me-2"></i>
@@ -230,7 +224,6 @@
               </select>
             </div>
             
-            <!-- Adicionar Produtos -->
             <div class="col-12 mt-4">
               <h6 class="section-title">
                 <i class="bi bi-box-seam me-2"></i>
@@ -282,7 +275,7 @@
               </div>
             </div>
             
-            <!-- Produtos Adicionados -->
+            
             <div class="col-12 mt-3">
               @if (itensVenda().length > 0) {
                 <div class="table-responsive">
@@ -376,9 +369,6 @@
   </div>
 </div>
 
-<!-- ========================================== -->
-<!-- MODAL DE DETALHES DA VENDA -->
-<!-- ========================================== -->
 <div class="modal fade" #detalhesModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">

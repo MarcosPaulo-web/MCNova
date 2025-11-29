@@ -1,4 +1,3 @@
-// agendamentos-lista.component.scss
 .agendamentos-page {
   .page-header {
     display: flex;
@@ -61,7 +60,6 @@
       padding: 0.35rem 0.65rem;
     }
     
-    // ✅ Dropdown de Status Clicável
     .status-dropdown-container {
       position: relative;
       display: inline-block;
@@ -83,7 +81,7 @@
       }
       
       .status-dropdown-menu {
-        position: fixed; // ✅ Fixed para não criar scroll
+        position: fixed; 
         z-index: 9999;
         min-width: 200px;
         max-width: 250px;
@@ -100,7 +98,7 @@
           padding: 0.5rem 1rem;
           cursor: pointer;
           transition: background-color 0.15s ease;
-          white-space: nowrap; // ✅ Evita quebra de linha
+          white-space: nowrap; 
           
           &:hover {
             background-color: #f8f9fa;
@@ -146,7 +144,6 @@
   }
 }
 
-// Modal
 .modal {
   .form-text {
     display: block;
@@ -155,7 +152,6 @@
   }
 }
 
-// Responsividade
 @media (max-width: 768px) {
   .agendamentos-page {
     .page-header {

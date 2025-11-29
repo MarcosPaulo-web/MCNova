@@ -16,7 +16,6 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return true;
   }
   
-  // Redireciona para dashboard se não tem permissão
   router.navigate(['/dashboard']);
   return false;
 };
