@@ -151,44 +151,44 @@
 
             <!-- CPF -->
             <div class="col-md-6">
-              <label for="nuCPF" class="form-label"
-                >CPF <span class="text-danger">*</span>
+              <label for="cpf" class="form-label">
+                CPF <span class="text-danger">*</span>
               </label>
               <input
                 type="text"
                 class="form-control"
-                id="nuCPF"
-                formControlName="nuCPF"
+                id="cpf"
+                formControlName="cpf"
                 placeholder="000.000.000-00"
                 maxlength="14"
                 (input)="formatarCPFInput($event)"
-                [class.is-invalid]="isFieldInvalid('nuCPF')"
+                [class.is-invalid]="isFieldInvalid('cpf')"
               />
-              @if (isFieldInvalid('nuCPF')) {
+              @if (isFieldInvalid('cpf')) {
               <div class="invalid-feedback">
-                {{ getFieldError("nuCPF") }}
+                {{ getFieldError("cpf") }}
               </div>
               }
             </div>
 
             <!-- Telefone -->
             <div class="col-md-6">
-              <label for="nuTelefone" class="form-label">
+              <label for="telefone" class="form-label">
                 Telefone <span class="text-danger">*</span>
               </label>
               <input
                 type="text"
                 class="form-control"
-                id="nuTelefone"
-                formControlName="nuTelefone"
+                id="telefone"
+                formControlName="telefone"
                 placeholder="(00) 00000-0000"
                 maxlength="15"
                 (input)="formatarTelefoneInput($event)"
-                [class.is-invalid]="isFieldInvalid('nuTelefone')"
+                [class.is-invalid]="isFieldInvalid('telefone')"
               />
-              @if (isFieldInvalid('nuTelefone')) {
+              @if (isFieldInvalid('telefone')) {
               <div class="invalid-feedback">
-                {{ getFieldError("nuTelefone") }}
+                {{ getFieldError("telefone") }}
               </div>
               }
             </div>
@@ -215,18 +215,18 @@
 
             <!-- Endereço -->
             <div class="col-md-12">
-              <label for="dsEndereco" class="form-label">Endereço</label>
+              <label for="endereco" class="form-label">Endereço</label>
               <textarea
                 class="form-control"
-                id="dsEndereco"
-                formControlName="dsEndereco"
+                id="endereco"
+                formControlName="endereco"
                 rows="2"
                 placeholder="Rua, número, bairro, cidade..."
-                [class.is-invalid]="isFieldInvalid('dsEndereco')"
+                [class.is-invalid]="isFieldInvalid('endereco')"
               ></textarea>
-              @if (isFieldInvalid('dsEndereco')) {
+              @if (isFieldInvalid('endereco')) {
               <div class="invalid-feedback">
-                {{ getFieldError("dsEndereco") }}
+                {{ getFieldError("endereco") }}
               </div>
               }
             </div>

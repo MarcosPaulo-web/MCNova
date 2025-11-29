@@ -42,14 +42,24 @@ export class LoginComponent {
     this.isLoading.set(true);
     this.errorMessage.set(null);
     
-    const credentials = this.loginForm.value;
+    const credentials = {
+      email: this.loginForm.value.email,
+      senha: this.loginForm.value.password
+    };
+    
+    console.log('🔐 Tentando fazer login com:', credentials.email);
     
     this.authService.login(credentials).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('✅ Login bem-sucedido:', response);
+        console.log('🔑 Token:', response.accessToken);
+        console.log('👤 Usuário:', response.usuario);
+        
         this.isLoading.set(false);
         // AuthService já redireciona para dashboard
       },
       error: (error) => {
+        console.error('❌ Erro no login:', error);
         this.isLoading.set(false);
         this.errorMessage.set(
           error.message || 'Email ou senha incorretos. Tente novamente.'

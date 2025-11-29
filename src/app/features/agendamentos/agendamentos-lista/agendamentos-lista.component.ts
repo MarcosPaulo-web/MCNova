@@ -112,24 +112,34 @@ export class AgendamentosListaComponent implements OnInit {
   }
   
   carregarAgendamentos(): Promise<void> {
-    return new Promise((resolve) => {
-      this.agendamentoService.listarTodos().subscribe({
-        next: (agendamentos) => {
-          const agendamentosOrdenados = agendamentos.sort((a, b) => {
+  return new Promise((resolve) => {
+    this.agendamentoService.listarTodos().subscribe({
+      next: (agendamentos) => {
+        console.log('📦 Agendamentos recebidos:', agendamentos);
+        
+        // ✅ CORRIGIDO: Verificar se é array antes de ordenar
+        if (Array.isArray(agendamentos)) {
+          const agendamentosOrdenados = [...agendamentos].sort((a, b) => {
             return new Date(b.dataAgendamento).getTime() - new Date(a.dataAgendamento).getTime();
           });
           this.agendamentos.set(agendamentosOrdenados);
-          this.aplicarFiltro();
-          resolve();
-        },
-        error: (error) => {
-          console.error('Erro ao carregar agendamentos:', error);
-          alert('Erro ao carregar agendamentos: ' + (error.message || 'Erro desconhecido'));
-          resolve();
+        } else {
+          console.error('❌ Resposta não é um array:', agendamentos);
+          this.agendamentos.set([]);
         }
-      });
+        
+        this.aplicarFiltro();
+        resolve();
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar agendamentos:', error);
+        alert('Erro ao carregar agendamentos: ' + (error.message || 'Erro desconhecido'));
+        this.agendamentos.set([]);
+        resolve();
+      }
     });
-  }
+  });
+}
   
   carregarClientes(): Promise<void> {
     return new Promise((resolve) => {

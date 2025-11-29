@@ -132,7 +132,7 @@ export interface ItemOrdemServico {
   cdProduto?: number;
   nomeProduto?: string;
   cdServico?: number;
-  nomeServico?: string;
+  servico?: string;
   quantidade: number;
   vlUnitario: number;
   vlTotal: number;

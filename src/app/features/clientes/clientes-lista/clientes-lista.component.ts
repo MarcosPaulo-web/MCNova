@@ -31,7 +31,7 @@ export class ClientesListaComponent implements OnInit {
   modoEdicao = signal(false);
   clienteEditando = signal<Cliente | null>(null);
   
-  searchTerm = signal('');
+  searchTerm: string = '';
   
   ngOnInit(): void {
     this.inicializarForm();
@@ -39,7 +39,6 @@ export class ClientesListaComponent implements OnInit {
   }
   
   ngAfterViewInit(): void {
-    // Inicializa o modal do Bootstrap
     if (this.modalElement) {
       this.modalInstance = new bootstrap.Modal(this.modalElement.nativeElement);
     }
@@ -48,9 +47,9 @@ export class ClientesListaComponent implements OnInit {
   inicializarForm(): void {
     this.clienteForm = this.fb.group({
       nmCliente: ['', [Validators.required, Validators.maxLength(120)]],
-      nuCPF: ['', [Validators.required, this.cpfValidator]],
-      nuTelefone: ['', [Validators.required]],
-      dsEndereco: ['', [Validators.maxLength(255)]],
+      cpf: ['', [Validators.required, this.cpfValidator]],
+      telefone: ['', [Validators.required]],
+      endereco: ['', [Validators.maxLength(255)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]]
     });
   }
@@ -60,19 +59,30 @@ export class ClientesListaComponent implements OnInit {
     
     this.clienteService.listarAtivos().subscribe({
       next: (clientes) => {
-        this.clientes.set(clientes);
-        this.aplicarFiltro();
+        console.log('📦 Clientes recebidos:', clientes);
+        
+        if (Array.isArray(clientes)) {
+          this.clientes.set(clientes);
+          this.clientesFiltrados.set(clientes);
+        } else {
+          console.error('❌ Resposta não é um array:', clientes);
+          this.clientes.set([]);
+          this.clientesFiltrados.set([]);
+        }
+        
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Erro ao carregar clientes:', error);
+        console.error('❌ Erro ao carregar clientes:', error);
         this.isLoading.set(false);
+        this.clientes.set([]);
+        this.clientesFiltrados.set([]);
       }
     });
   }
   
   aplicarFiltro(): void {
-    const termo = this.searchTerm().toLowerCase();
+    const termo = this.searchTerm.toLowerCase();
     
     if (!termo) {
       this.clientesFiltrados.set(this.clientes());
@@ -100,11 +110,13 @@ export class ClientesListaComponent implements OnInit {
     this.modoEdicao.set(true);
     this.clienteEditando.set(cliente);
     
+    console.log('📝 Editando cliente:', cliente);
+    
     this.clienteForm.patchValue({
       nmCliente: cliente.nmCliente,
-      nuCPF: cliente.cpf || '',
-      nuTelefone: cliente.telefone || '',
-      dsEndereco: cliente.endereco || '',
+      cpf: cliente.cpf || '',
+      telefone: cliente.telefone || '',
+      endereco: cliente.endereco || '',
       email: cliente.email || ''
     });
     
@@ -127,9 +139,9 @@ export class ClientesListaComponent implements OnInit {
     const formValue = this.clienteForm.value;
     const dados: ClienteRequest = {
       nmCliente: formValue.nmCliente,
-      cpf: formValue.nuCPF ? removerFormatacao(formValue.nuCPF) : undefined,
-      telefone: formValue.nuTelefone ? removerFormatacao(formValue.nuTelefone) : undefined,
-      dsEndereco: formValue.dsEndereco || undefined,
+      cpf: formValue.cpf ? removerFormatacao(formValue.cpf) : undefined,
+      telefone: formValue.telefone ? removerFormatacao(formValue.telefone) : undefined,
+      endereco: formValue.endereco || undefined,
       email: formValue.email || undefined
     };
     
@@ -142,9 +154,10 @@ export class ClientesListaComponent implements OnInit {
         this.isSubmitting.set(false);
         this.fecharModal();
         this.carregarClientes();
+        alert(this.modoEdicao() ? 'Cliente atualizado com sucesso!' : 'Cliente cadastrado com sucesso!');
       },
       error: (error) => {
-        console.error('Erro ao salvar cliente:', error);
+        console.error('❌ Erro ao salvar cliente:', error);
         this.isSubmitting.set(false);
         alert(error.message || 'Erro ao salvar cliente');
       }
@@ -156,16 +169,16 @@ export class ClientesListaComponent implements OnInit {
       this.clienteService.deletar(cliente.cdCliente).subscribe({
         next: () => {
           this.carregarClientes();
+          alert('Cliente excluído com sucesso!');
         },
         error: (error) => {
-          console.error('Erro ao excluir cliente:', error);
+          console.error('❌ Erro ao excluir cliente:', error);
           alert('Erro ao excluir cliente');
         }
       });
     }
   }
   
-  // Formatação em tempo real
   formatarCPFInput(event: any): void {
     const input = event.target;
     let value = input.value.replace(/\D/g, '');
@@ -184,7 +197,6 @@ export class ClientesListaComponent implements OnInit {
     }
   }
   
-  // Validadores
   cpfValidator(control: any): { [key: string]: any } | null {
     if (!control.value) {
       return null;
@@ -203,7 +215,6 @@ export class ClientesListaComponent implements OnInit {
     return null;
   }
   
-  // Helpers
   isFieldInvalid(fieldName: string): boolean {
     const field = this.clienteForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));

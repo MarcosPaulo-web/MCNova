@@ -45,8 +45,8 @@ export interface Cliente {
   nmCliente: string;
   cpf?: string;
   telefone?: string;
-  endereco?: string;
   email?: string;
+  endereco?: string;
   ativo: boolean;
 }
 
@@ -54,8 +54,8 @@ export interface ClienteRequest {
   nmCliente: string;
   cpf?: string;
   telefone?: string;
-  dsEndereco?: string;
   email?: string;
+  endereco?: string;
 }
 
 // ==================== VEICULO ====================
