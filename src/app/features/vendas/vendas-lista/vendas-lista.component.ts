@@ -357,4 +357,6 @@ export class VendasListaComponent implements OnInit {
     }
     return 0;
   }
+
+  
 }

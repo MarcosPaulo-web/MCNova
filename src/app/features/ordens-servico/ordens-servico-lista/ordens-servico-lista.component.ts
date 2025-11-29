@@ -615,6 +615,8 @@ export class OrdensServicoListaComponent implements OnInit {
       quantidade: item.quantidade,
       vlUnitario: item.vlUnitario
     }));
+
+    
     
     const dados: OrdemServicoRequest = {
       cdCliente: formValue.cdCliente,
@@ -622,7 +624,7 @@ export class OrdensServicoListaComponent implements OnInit {
       cdMecanico: formValue.cdMecanico,
       tipoOrdemOrcamento: formValue.tipoOrdemOrcamento,
       dataAgendamento: formValue.dataAgendamento || undefined,
-      vlMaoObraExtra: parseFloat(formValue.vlMaoObraExtra) || undefined,
+      vlMaoObra: parseFloat(formValue.vlMaoObraExtra) || 0,
       diagnostico: formValue.diagnostico || undefined,
       itens: itensRequest
     };
@@ -710,6 +712,13 @@ export class OrdensServicoListaComponent implements OnInit {
       }
     });
   }
+  atualizarMaoObra(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  const valor = parseFloat(input.value) || 0;
+  this.ordemForm.patchValue({ vlMaoObraExtra: valor });
+}
+
+
   
   // ==================== EDITAR ORDEM ====================
   
@@ -722,6 +731,7 @@ export class OrdensServicoListaComponent implements OnInit {
     this.editarModalInstance?.show();
   }
   
+  // ✅ CORRIGIDO: Método de edição que atualiza corretamente a mão de obra
   salvarEdicao(): void {
     const ordem = this.ordemParaEditar();
     if (!ordem) return;
@@ -729,25 +739,30 @@ export class OrdensServicoListaComponent implements OnInit {
     this.isSubmitting.set(true);
     const formValue = this.editarForm.value;
     
-    const dados: OrdemServicoRequest = {
-      cdCliente: ordem.cdCliente!,
-      cdVeiculo: ordem.cdVeiculo!,
-      cdMecanico: ordem.cdMecanico!,
-      tipoOrdemOrcamento: ordem.tipoOrdemOrcamento,
-      diagnostico: formValue.diagnostico || undefined,
-      vlMaoObraExtra: parseFloat(formValue.vlMaoObraExtra) || undefined,
-      itens: []
+    // ✅ CORRIGIDO: Enviando apenas os campos editáveis
+    // Backend deve recalcular o total com base nos itens existentes + nova mão de obra
+    const dados = {
+      diagnostico: formValue.diagnostico || '',
+      vlMaoObraExtra: parseFloat(formValue.vlMaoObraExtra) || 0
     };
     
-    this.ordemServicoService.atualizar(ordem.cdOrdemServico, dados).subscribe({
+    console.log('📤 Atualizando ordem #' + ordem.cdOrdemServico, dados);
+    
+    // Vamos usar um endpoint PATCH específico para atualização parcial
+    this.ordemServicoService.atualizarDiagnosticoEMaoObra(
+      ordem.cdOrdemServico, 
+      dados.diagnostico, 
+      dados.vlMaoObraExtra
+    ).subscribe({
       next: () => {
+        console.log('✅ Ordem atualizada');
         this.isSubmitting.set(false);
         this.editarModalInstance?.hide();
         this.carregarOrdens();
         alert('✅ Ordem atualizada com sucesso!');
       },
       error: (error) => {
-        console.error('Erro ao atualizar:', error);
+        console.error('❌ Erro ao atualizar:', error);
         this.isSubmitting.set(false);
         alert('❌ ' + (error.error?.message || 'Erro ao atualizar ordem'));
       }

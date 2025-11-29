@@ -28,6 +28,23 @@ export class OrdemServicoService {
     return this.http.put<OrdemServico>(`${this.apiUrl}/${id}`, data);
   }
   
+  // ✅ NOVO: Atualização parcial - apenas diagnóstico e mão de obra
+  atualizarDiagnosticoEMaoObra(
+    id: number, 
+    diagnostico: string, 
+    vlMaoObraExtra: number
+  ): Observable<OrdemServico> {
+    const dados = {
+      diagnostico,
+      vlMaoObraExtra
+    };
+    console.log(`📤 PATCH /ordens-servico/${id}/diagnostico-e-mao-obra:`, dados);
+    return this.http.patch<OrdemServico>(
+      `${this.apiUrl}/${id}/diagnostico-e-mao-obra`, 
+      dados
+    );
+  }
+  
   deletar(id: number): Observable<void> {
     console.log(`🗑️ DELETE /ordens-servico/${id}`);
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

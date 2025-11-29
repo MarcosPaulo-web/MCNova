@@ -121,7 +121,7 @@ export interface OrdemServicoRequest {
   cdMecanico: number;
   tipoOrdemOrcamento: TipoOrdemOrcamento;
   dataAgendamento?: string;
-  vlMaoObraExtra?: number;
+  vlMaoObra?: number;
   diagnostico?: string;
   itens: ItemOrdemServicoRequest[];
 }
@@ -159,8 +159,8 @@ export interface Venda {
   clienteModel?: {             // ✅ Backend usa "clienteModel"
     cdCliente: number;
     nmCliente: string;
-    nuCPF?: string;
-    nuTelefone?: string;
+    CPF?: string;
+    Telefone?: string;
     email?: string;
   };
   
