@@ -111,35 +111,35 @@ export class AgendamentosListaComponent implements OnInit {
     });
   }
   
+  // ✅ CORRIGIDO: Método separado sem finally
   carregarAgendamentos(): Promise<void> {
-  return new Promise((resolve) => {
-    this.agendamentoService.listarTodos().subscribe({
-      next: (agendamentos) => {
-        console.log('📦 Agendamentos recebidos:', agendamentos);
-        
-        // ✅ CORRIGIDO: Verificar se é array antes de ordenar
-        if (Array.isArray(agendamentos)) {
-          const agendamentosOrdenados = [...agendamentos].sort((a, b) => {
-            return new Date(b.dataAgendamento).getTime() - new Date(a.dataAgendamento).getTime();
-          });
-          this.agendamentos.set(agendamentosOrdenados);
-        } else {
-          console.error('❌ Resposta não é um array:', agendamentos);
+    return new Promise((resolve) => {
+      this.agendamentoService.listarTodos().subscribe({
+        next: (agendamentos) => {
+          console.log('📦 Agendamentos recebidos:', agendamentos);
+          
+          if (Array.isArray(agendamentos)) {
+            const agendamentosOrdenados = [...agendamentos].sort((a, b) => {
+              return new Date(b.dataAgendamento).getTime() - new Date(a.dataAgendamento).getTime();
+            });
+            this.agendamentos.set(agendamentosOrdenados);
+          } else {
+            console.error('❌ Resposta não é um array:', agendamentos);
+            this.agendamentos.set([]);
+          }
+          
+          this.aplicarFiltro();
+          resolve();
+        },
+        error: (error) => {
+          console.error('❌ Erro ao carregar agendamentos:', error);
+          alert('Erro ao carregar agendamentos: ' + (error.message || 'Erro desconhecido'));
           this.agendamentos.set([]);
+          resolve();
         }
-        
-        this.aplicarFiltro();
-        resolve();
-      },
-      error: (error) => {
-        console.error('❌ Erro ao carregar agendamentos:', error);
-        alert('Erro ao carregar agendamentos: ' + (error.message || 'Erro desconhecido'));
-        this.agendamentos.set([]);
-        resolve();
-      }
+      });
     });
-  });
-}
+  }
   
   carregarClientes(): Promise<void> {
     return new Promise((resolve) => {
@@ -199,9 +199,9 @@ export class AgendamentosListaComponent implements OnInit {
     
     if (termo) {
       filtrados = filtrados.filter(agendamento =>
-        agendamento.nomeCliente?.toLowerCase().includes(termo) ||        // ✅ CORRIGIDO
-        agendamento.placaVeiculo?.toLowerCase().includes(termo) ||       // ✅ CORRIGIDO
-        agendamento.nomeMecanico?.toLowerCase().includes(termo) ||       // ✅ CORRIGIDO
+        agendamento.nomeCliente?.toLowerCase().includes(termo) ||
+        agendamento.placaVeiculo?.toLowerCase().includes(termo) ||
+        agendamento.nomeMecanico?.toLowerCase().includes(termo) ||
         agendamento.observacoes?.toLowerCase().includes(termo)
       );
     }
@@ -240,6 +240,7 @@ export class AgendamentosListaComponent implements OnInit {
     return this.dropdownAbertoId() === agendamentoId;
   }
   
+  // ✅ CORRIGIDO: Gerenciamento correto do loading
   mudarStatus(agendamento: Agendamento, novoStatus: Status, event: Event): void {
     event.stopPropagation();
     this.dropdownAbertoId.set(null);
@@ -259,15 +260,21 @@ export class AgendamentosListaComponent implements OnInit {
       return;
     }
     
+    console.log('🔄 Mudando status de', agendamento.status, 'para', novoStatus);
     this.isLoading.set(true);
     
     this.agendamentoService.atualizarStatus(agendamento.cdAgendamento, novoStatus).subscribe({
       next: () => {
-        this.carregarAgendamentos();
-        alert('✅ Status atualizado com sucesso! A Ordem de Serviço foi sincronizada automaticamente.');
+        console.log('✅ Status atualizado com sucesso');
+        
+        // ✅ CORRIGIDO: Atualizar apenas os agendamentos e desligar loading depois
+        this.carregarAgendamentos().then(() => {
+          this.isLoading.set(false);
+          alert('✅ Status atualizado com sucesso! A Ordem de Serviço foi sincronizada automaticamente.');
+        });
       },
       error: (error) => {
-        console.error('Erro ao atualizar status:', error);
+        console.error('❌ Erro ao atualizar status:', error);
         this.isLoading.set(false);
         alert('❌ ' + (error.message || 'Erro ao atualizar status do agendamento'));
       }
@@ -339,7 +346,10 @@ export class AgendamentosListaComponent implements OnInit {
       next: () => {
         this.isSubmitting.set(false);
         this.fecharModal();
+        
+        // ✅ Recarregar agendamentos sem mostrar loading global
         this.carregarAgendamentos();
+        
         alert(this.modoEdicao() ? 'Agendamento atualizado com sucesso!' : 'Agendamento criado com sucesso!');
       },
       error: (error) => {
@@ -352,13 +362,18 @@ export class AgendamentosListaComponent implements OnInit {
   
   confirmarCancelamento(agendamento: Agendamento): void {
     if (confirm(`Deseja realmente cancelar o agendamento de ${agendamento.nomeCliente} no dia ${this.formatarData(agendamento.dataAgendamento)}?`)) {
+      this.isLoading.set(true);
+      
       this.agendamentoService.cancelar(agendamento.cdAgendamento).subscribe({
         next: () => {
-          this.carregarAgendamentos();
-          alert('Agendamento cancelado com sucesso!');
+          this.carregarAgendamentos().then(() => {
+            this.isLoading.set(false);
+            alert('Agendamento cancelado com sucesso!');
+          });
         },
         error: (error) => {
           console.error('Erro ao cancelar agendamento:', error);
+          this.isLoading.set(false);
           alert('Erro ao cancelar agendamento: ' + (error.message || 'Erro desconhecido'));
         }
       });
