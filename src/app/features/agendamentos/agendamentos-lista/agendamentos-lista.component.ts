@@ -199,9 +199,9 @@ export class AgendamentosListaComponent implements OnInit {
     
     if (termo) {
       filtrados = filtrados.filter(agendamento =>
-        agendamento.nomeCliente?.toLowerCase().includes(termo) ||
+        agendamento.nmCliente?.toLowerCase().includes(termo) ||
         agendamento.placaVeiculo?.toLowerCase().includes(termo) ||
-        agendamento.nomeMecanico?.toLowerCase().includes(termo) ||
+        agendamento.nmMecanico?.toLowerCase().includes(termo) ||
         agendamento.observacoes?.toLowerCase().includes(termo)
       );
     }
@@ -361,7 +361,7 @@ export class AgendamentosListaComponent implements OnInit {
   }
   
   confirmarCancelamento(agendamento: Agendamento): void {
-    if (confirm(`Deseja realmente cancelar o agendamento de ${agendamento.nomeCliente} no dia ${this.formatarData(agendamento.dataAgendamento)}?`)) {
+    if (confirm(`Deseja realmente cancelar o agendamento de ${agendamento.nmCliente} no dia ${this.formatarData(agendamento.dataAgendamento)}?`)) {
       this.isLoading.set(true);
       
       this.agendamentoService.cancelar(agendamento.cdAgendamento).subscribe({

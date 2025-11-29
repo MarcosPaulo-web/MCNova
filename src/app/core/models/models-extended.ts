@@ -11,7 +11,7 @@ export interface Agendamento {
   
   // Cliente
   cdCliente: number;
-  nomeCliente: string;
+  nmCliente: string;
   cpfCliente: string;
   telefoneCliente: string;
   
@@ -23,7 +23,7 @@ export interface Agendamento {
   
   // Mecânico
   cdMecanico: number;
-  nomeMecanico: string;
+  nmMecanico: string;
   
   // Agendamento
   dataAgendamento: string;
