@@ -3,29 +3,65 @@
 // VERSÃO CORRIGIDA - Compatível com o Backend
 // ========================================
 
-import { FormaPagamento, StatusOrdemServico, TipoServico, StatusAgendamento } from './enums';
+import { FormaPagamento, StatusAgendamento, TipoServico } from './enums';
 
+// ==================== AGENDAMENTO ====================
+export interface Agendamento {
+  cdAgendamento: number;
+  
+  // Cliente
+  cdCliente: number;
+  nomeCliente: string;
+  cpfCliente: string;
+  telefoneCliente: string;
+  
+  // Veículo
+  cdVeiculo: number;
+  placaVeiculo: string;
+  modeloVeiculo: string;
+  marcaVeiculo: string;
+  
+  // Mecânico
+  cdMecanico: number;
+  nomeMecanico: string;
+  
+  // Agendamento
+  dataAgendamento: string;
+  status: StatusAgendamento;
+  observacoes?: string;
+  
+  // Ordem de Serviço vinculada
+  cdOrdemServico?: number;
+}
+
+export interface AgendamentoRequest {
+  cdCliente: number;
+  cdVeiculo: number;
+  cdMecanico: number;
+  dataAgendamento: string;
+  observacoes?: string;
+}
+
+// ==================== PRODUTO ====================
 // ==================== PRODUTO ====================
 export interface Produto {
   cdProduto: number;
   nmProduto: string;
   dsProduto?: string;
   categoria?: string;
-  vlCusto: number;
-  vlVenda: number;
+  vlProduto: number;      // ✅ ÚNICO CAMPO DE VALOR
   qtdEstoque: number;
-  qtdMinimo: number;
+  qtdMinimoEstoque: number;     
   ativo: boolean;
 }
 
 export interface ProdutoRequest {
   nmProduto: string;
-  dsProduto?: string | null;
-  categoria?: string | null;
-  vlCusto: number;
-  vlVenda: number;
+  dsProduto?: string;
+  categoria?: string;
+  vlProduto: number;      // ✅ ÚNICO CAMPO DE VALOR
   qtdEstoque: number;
-  qtdMinimo: number;
+  qtdMinimo: number;      // ✅ CORRIGIDO
 }
 
 // ==================== SERVICO ====================
@@ -43,51 +79,39 @@ export interface ServicoRequest {
   vlServico: number;
 }
 
-// ==================== AGENDAMENTO ====================
-export interface Agendamento {
-  cdAgendamento: number;
-  cdCliente: number;
-  nmCliente?: string; 
-  cdVeiculo: number;
-  placa?: string; 
-  cdMecanico: number;
-  nmMecanico?: string; 
-  dataAgendamento: string; 
-  status: StatusAgendamento;
-  observacoes?: string;
-}
-
-export interface AgendamentoRequest {
-  cdCliente: number;
-  cdVeiculo: number;
-  cdMecanico: number;
-  dataAgendamento: string;
-  observacoes?: string;
-  status?: StatusAgendamento;
-}
-
 // ==================== ORDEM DE SERVICO ====================
-// ✅ CORRIGIDO: Interface atualizada para corresponder ao backend
 export interface OrdemServico {
   cdOrdemServico: number;
-  cdCliente?: number; // Backend retorna direto
-  nmCliente?: string; // Backend retorna direto
-  cdVeiculo?: number; // Backend retorna direto
-  placa?: string; // Backend retorna direto
-  modeloVeiculo?: string; // Backend retorna direto
-  cdMecanico?: number; // Backend retorna direto
-  nmMecanico?: string; // Backend retorna direto
+  
+  // Cliente
+  cdCliente: number;
+  nomeCliente: string;
+  
+  // Veículo
+  cdVeiculo: number;
+  placaVeiculo: string;
+  modeloVeiculo: string;
+  marcaVeiculo: string;
+  
+  // Mecânico
+  cdMecanico: number;
+  nomeMecanico: string;
+  
+  // Dados da OS
   tipoServico: TipoServico;
-  statusOrdemServico: StatusOrdemServico; // ✅ NOME CORRETO DO BACKEND
+  status: StatusAgendamento;
+  dataAgendamento: string;
   dataAbertura: string;
-  dataFechamento?: string;
+  
+  // Valores
   vlPecas: number;
-  vlMaoObra: number;
+  vlServicos: number;
+  vlMaoObraExtra: number;
   vlTotal: number;
-  desconto: number;
-  observacoes?: string;
+  
   diagnostico?: string;
   aprovado: boolean;
+  
   itens?: ItemOrdemServico[];
 }
 
@@ -98,8 +122,6 @@ export interface OrdemServicoRequest {
   tipoServico: TipoServico;
   dataAgendamento?: string;
   vlMaoObra?: number;
-  desconto?: number;
-  observacoes?: string;
   diagnostico?: string;
   itens: ItemOrdemServicoRequest[];
 }
@@ -108,9 +130,9 @@ export interface OrdemServicoRequest {
 export interface ItemOrdemServico {
   cdItemOrdemServico: number;
   cdProduto?: number;
-  produto?: Produto;
+  nomeProduto?: string;
   cdServico?: number;
-  servico?: Servico;
+  nomeServico?: string;
   quantidade: number;
   vlUnitario: number;
   vlTotal: number;
@@ -120,25 +142,37 @@ export interface ItemOrdemServicoRequest {
   cdProduto?: number;
   cdServico?: number;
   quantidade: number;
-  vlUnitario: number;
 }
 
 // ==================== VENDA ====================
+// ✅ CORRIGIDO: Interface compatível com o backend
 export interface Venda {
   cdVenda: number;
-  cdCliente?: number;
-  cliente?: { cdCliente: number; nmCliente: string };
-  cdAtendente: number;
-  atendente?: { cdUsuario: number; nmUsuario: string };
-  dataVenda: string;
+  dataVenda: string;           // ✅ LocalDateTime no backend
   vlTotal: number;
-  desconto: number;
+  desconto?: number;
   formaPagamento: FormaPagamento;
+  
+  // ✅ CORRIGIDO: Backend retorna objetos aninhados
+  clienteModel?: {             // ✅ Backend usa "clienteModel"
+    cdCliente: number;
+    nmCliente: string;
+    nuCPF?: string;
+    nuTelefone?: string;
+    email?: string;
+  };
+  
+  atendente?: {                // ✅ Backend usa "atendente"
+    cdUsuario: number;
+    nmUsuario: string;
+    email?: string;
+  };
+  
   itens?: ItemVenda[];
 }
 
 export interface VendaRequest {
-  cdCliente?: number;
+  cdCliente: number;           // ✅ Obrigatório no backend
   cdAtendente: number;
   desconto?: number;
   formaPagamento: FormaPagamento;
@@ -149,28 +183,30 @@ export interface VendaRequest {
 export interface ItemVenda {
   cdItemVenda: number;
   cdProduto: number;
-  produto?: Produto;
   quantidade: number;
   vlUnitario: number;
   vlTotal: number;
+  
+  // ✅ Produto aninhado (se o backend retornar)
+  produto?: {
+    cdProduto: number;
+    nmProduto: string;
+    vlProduto: number;
+  };
 }
 
 export interface ItemVendaRequest {
   cdProduto: number;
   quantidade: number;
-  vlUnitario: number;
+  // ✅ vlUnitario não é necessário no request - backend calcula
 }
 
 // ==================== FATURAMENTO ====================
 export interface Faturamento {
   cdFaturamento: number;
   cdVenda?: number;
-  venda?: { cdVenda: number };
   cdOrdemServico?: number;
-  ordemServico?: { cdOrdemServico: number };
-  cliente?: { cdCliente: number; nmCliente: string };
   dataVenda: string;
-  dataFaturamento: string;
   vlTotal: number;
   formaPagamento: FormaPagamento;
 }

@@ -1,4 +1,3 @@
-// src/app/core/services/agendamento.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -11,45 +10,39 @@ import { Agendamento, AgendamentoRequest, StatusAgendamento } from '../models';
 export class AgendamentoService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/agendamentos`;
+
+  // ==================== CRUD ====================
   
-  // Criar novo agendamento
   criar(data: AgendamentoRequest): Observable<Agendamento> {
     return this.http.post<Agendamento>(this.apiUrl, data);
   }
-  
-  // Buscar por ID
+
   buscarPorId(id: number): Observable<Agendamento> {
     return this.http.get<Agendamento>(`${this.apiUrl}/${id}`);
   }
-  
-  // Listar por mecanico
-  listarPorMecanico(cdMecanico: number): Observable<Agendamento[]> {
-    return this.http.get<Agendamento[]>(`${this.apiUrl}/mecanico/${cdMecanico}`);
-  }
-  
-  // Listar agendamentos futuros
-  listarFuturos(): Observable<Agendamento[]> {
-    return this.http.get<Agendamento[]>(`${this.apiUrl}/futuros`);
-  }
-  
-  // ✅ NOVO: Listar TODOS os agendamentos (incluindo os criados automaticamente pelas OS)
+
   listarTodos(): Observable<Agendamento[]> {
     return this.http.get<Agendamento[]>(this.apiUrl);
   }
-  
-  // Atualizar agendamento
+
+  listarPorMecanico(cdMecanico: number): Observable<Agendamento[]> {
+    return this.http.get<Agendamento[]>(`${this.apiUrl}/mecanico/${cdMecanico}`);
+  }
+
+  listarFuturos(): Observable<Agendamento[]> {
+    return this.http.get<Agendamento[]>(`${this.apiUrl}/futuros`);
+  }
+
   atualizar(id: number, data: AgendamentoRequest): Observable<Agendamento> {
     return this.http.put<Agendamento>(`${this.apiUrl}/${id}`, data);
   }
-  
-  // ✅ NOVO: Atualizar status do agendamento (sincroniza com OS)
-  atualizarStatus(id: number, novoStatus: StatusAgendamento): Observable<Agendamento> {
-    return this.http.patch<Agendamento>(`${this.apiUrl}/${id}/status`, {
-      status: novoStatus
-    });
+
+  // ✅ ATUALIZAR STATUS (sincroniza com OS automaticamente no backend)
+  atualizarStatus(id: number, status: StatusAgendamento): Observable<Agendamento> {
+    return this.http.patch<Agendamento>(`${this.apiUrl}/${id}/status`, { status });
   }
-  
-  // Cancelar agendamento
+
+  // ✅ CANCELAR
   cancelar(id: number): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/cancelar`, {});
   }

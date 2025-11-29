@@ -55,9 +55,7 @@
                   <th>Código</th>
                   <th>Produto</th>
                   <th>Categoria</th>
-                  <th>Custo</th>
-                  <th>Venda</th>
-                  <th>Margem</th>
+                  <th>Preço</th> <!-- ✅ SIMPLIFICADO -->
                   <th>Estoque</th>
                   <th>Mín.</th>
                   <th>Status</th>
@@ -66,7 +64,7 @@
               </thead>
               <tbody>
                 @for (produto of produtos; track produto.cdProduto) {
-                  <tr [class.table-warning]="produto.qtdEstoque <= produto.qtdMinimo">
+                  <tr [class.table-warning]="produto.qtdEstoque <= produto.qtdMinimoEstoque">
                     <td>
                       <span class="badge bg-secondary">#{{ produto.cdProduto }}</span>
                     </td>
@@ -87,30 +85,24 @@
                       }
                     </td>
                     <td>
-                      <small class="text-muted">R$ {{ produto.vlCusto.toFixed(2) }}</small>
-                    </td>
-                    <td>
-                      <strong class="text-success">R$ {{ produto.vlVenda.toFixed(2) }}</strong>
-                    </td>
-                    <td>
-                      <span class="badge bg-success">
-                        {{ calcularMargem(produto.vlCusto, produto.vlVenda) }}%
-                      </span>
+                      <!-- ✅ APENAS UM PREÇO -->
+                      <strong class="text-success">R$ {{ produto.vlProduto.toFixed(2) }}</strong>
                     </td>
                     <td>
                       <span 
                         class="badge"
-                        [class.bg-danger]="produto.qtdEstoque <= produto.qtdMinimo"
-                        [class.bg-success]="produto.qtdEstoque > produto.qtdMinimo"
+                        [class.bg-danger]="produto.qtdEstoque <= produto.qtdMinimoEstoque"
+                        [class.bg-success]="produto.qtdEstoque > produto.qtdMinimoEstoque"
                       >
                         {{ produto.qtdEstoque }}
                       </span>
                     </td>
                     <td>
-                      <span class="text-muted">{{ produto.qtdMinimo }}</span>
+                      <!-- ✅ CORRIGIDO: qtdMinimo -->
+                      <span class="text-muted">{{ produto.qtdMinimoEstoque }}</span>
                     </td>
                     <td>
-                      @if (produto.qtdEstoque <= produto.qtdMinimo) {
+                      @if (produto.qtdEstoque <= produto.qtdMinimoEstoque) {
                         <span class="badge bg-danger">
                           <i class="bi bi-exclamation-triangle"></i>
                           Baixo
@@ -235,7 +227,7 @@
                 }
               </div>
               
-              <!-- Categoria - CAMPO DE TEXTO LIVRE -->
+              <!-- Categoria -->
               <div class="col-md-12">
                 <label for="categoria" class="form-label">Categoria</label>
                 <input
@@ -251,69 +243,31 @@
                 </small>
               </div>
               
-              <!-- Valor de Custo -->
-              <div class="col-md-6">
-                <label for="vlCusto" class="form-label">
-                  Valor de Custo (R$) <span class="text-danger">*</span>
+              <!-- ✅ ÚNICO CAMPO DE PREÇO -->
+              <div class="col-md-12">
+                <label for="vlProduto" class="form-label">
+                  Preço do Produto (R$) <span class="text-danger">*</span>
                 </label>
                 <div class="input-group">
                   <span class="input-group-text">R$</span>
                   <input
                     type="number"
                     class="form-control"
-                    id="vlCusto"
-                    formControlName="vlCusto"
+                    id="vlProduto"
+                    formControlName="vlProduto"
                     placeholder="0.00"
                     step="0.01"
                     min="0.01"
-                    [class.is-invalid]="isInvalid('vlCusto')"
+                    [class.is-invalid]="isInvalid('vlProduto')"
                   />
-                  @if (isInvalid('vlCusto')) {
+                  @if (isInvalid('vlProduto')) {
                     <div class="invalid-feedback">
-                      Valor de custo é obrigatório e deve ser maior que zero
+                      Preço do produto é obrigatório e deve ser maior que zero
                     </div>
                   }
                 </div>
-                <small class="form-text text-muted">Preço de compra do produto</small>
+                <small class="form-text text-muted">Preço de venda do produto</small>
               </div>
-              
-              <!-- Valor de Venda -->
-              <div class="col-md-6">
-                <label for="vlVenda" class="form-label">
-                  Valor de Venda (R$) <span class="text-danger">*</span>
-                </label>
-                <div class="input-group">
-                  <span class="input-group-text">R$</span>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="vlVenda"
-                    formControlName="vlVenda"
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0.01"
-                    [class.is-invalid]="isInvalid('vlVenda')"
-                  />
-                  @if (isInvalid('vlVenda')) {
-                    <div class="invalid-feedback">
-                      Valor de venda é obrigatório e deve ser maior que o custo
-                    </div>
-                  }
-                </div>
-                <small class="form-text text-muted">Preço de venda ao cliente</small>
-              </div>
-              
-              <!-- Margem de Lucro (Calculada) -->
-              @if (produtoForm.value.vlCusto > 0 && produtoForm.value.vlVenda > 0) {
-                <div class="col-md-12">
-                  <div class="alert alert-info mb-0">
-                    <i class="bi bi-info-circle me-2"></i>
-                    <strong>Margem de Lucro:</strong>
-                    {{ calcularMargem(produtoForm.value.vlCusto, produtoForm.value.vlVenda) }}%
-                    (Lucro: R$ {{ (produtoForm.value.vlVenda - produtoForm.value.vlCusto).toFixed(2) }})
-                  </div>
-                </div>
-              }
               
               <!-- Quantidade em Estoque -->
               <div class="col-md-6">

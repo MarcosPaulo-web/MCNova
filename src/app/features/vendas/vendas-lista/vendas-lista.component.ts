@@ -127,6 +127,7 @@ export class VendasListaComponent implements OnInit {
     });
   }
   
+  // ✅ CORRIGIDO: Aplicar filtro usando clienteModel e atendente
   aplicarFiltro(): void {
     const termo = this.searchTerm().toLowerCase();
     
@@ -135,10 +136,13 @@ export class VendasListaComponent implements OnInit {
       return;
     }
     
-    const filtradas = this.vendas().filter(venda =>
-      venda.cliente?.nmCliente.toLowerCase().includes(termo) ||
-      venda.atendente?.nmUsuario.toLowerCase().includes(termo)
-    );
+    const filtradas = this.vendas().filter(venda => {
+      // ✅ Usa clienteModel (não cliente)
+      const nomeCliente = venda.clienteModel?.nmCliente?.toLowerCase() || '';
+      const nomeAtendente = venda.atendente?.nmUsuario?.toLowerCase() || '';
+      
+      return nomeCliente.includes(termo) || nomeAtendente.includes(termo);
+    });
     
     this.vendasFiltradas.set(filtradas);
   }
@@ -157,6 +161,7 @@ export class VendasListaComponent implements OnInit {
     this.itensVenda.set([]);
   }
   
+  // ✅ CORRIGIDO: Usar vlProduto (backend usa este nome)
   adicionarProduto(): void {
     const cdProduto = this.produtoSelecionado();
     const quantidade = this.quantidadeProduto();
@@ -205,13 +210,13 @@ export class VendasListaComponent implements OnInit {
       
       this.itensVenda.set(novosItens);
     } else {
-      // Adiciona novo item
+      // ✅ CORRIGIDO: Usa vlProduto (não vlVenda)
       const novoItem: ItemVendaLocal = {
         cdProduto: produto.cdProduto,
         produto: produto,
         quantidade: quantidade,
-        vlUnitario: produto.vlVenda,
-        vlTotal: quantidade * produto.vlVenda
+        vlUnitario: produto.vlProduto,  // ✅ Backend usa vlProduto
+        vlTotal: quantidade * produto.vlProduto
       };
       
       this.itensVenda.set([...this.itensVenda(), novoItem]);
@@ -246,10 +251,10 @@ export class VendasListaComponent implements OnInit {
     const formValue = this.vendaForm.value;
     const usuarioLogado = this.authService.getCurrentUser();
     
+    // ✅ CORRIGIDO: ItemVendaRequest não precisa de vlUnitario (backend calcula)
     const itens: ItemVendaRequest[] = this.itensVenda().map(item => ({
       cdProduto: item.cdProduto,
-      quantidade: item.quantidade,
-      vlUnitario: item.vlUnitario
+      quantidade: item.quantidade
     }));
     
     const dados: VendaRequest = {
@@ -301,20 +306,23 @@ export class VendasListaComponent implements OnInit {
     return cliente?.nmCliente || 'Cliente não encontrado';
   }
   
-  // ✅ CORRIGIDO: Formatação de data
-  formatarData(dataISO: string): string {
+  formatarData(dataISO: string | any): string {
     if (!dataISO) return '-';
     
     try {
-      // Tenta vários formatos de data
       let data: Date;
       
+      // ✅ Se vier como array (LocalDateTime serializado): [2025, 11, 28, 10, 30, 0]
+      if (Array.isArray(dataISO)) {
+        const [ano, mes, dia, hora = 0, min = 0, seg = 0] = dataISO;
+        data = new Date(ano, mes - 1, dia, hora, min, seg);
+      }
       // Se vier como ISO: "2025-11-27T10:30:00"
-      if (dataISO.includes('T')) {
+      else if (typeof dataISO === 'string' && dataISO.includes('T')) {
         data = new Date(dataISO);
       }
       // Se vier como LocalDateTime: "2025-11-27 10:30:00"
-      else if (dataISO.includes(' ')) {
+      else if (typeof dataISO === 'string' && dataISO.includes(' ')) {
         const [datePart, timePart] = dataISO.split(' ');
         data = new Date(`${datePart}T${timePart}`);
       }
@@ -343,14 +351,10 @@ export class VendasListaComponent implements OnInit {
     }
   }
   
-  // ✅ MÉTODO PARA CONTAR ITENS DA VENDA
   contarItens(venda: Venda): number {
-    // Se a venda tem itens no objeto
     if (venda.itens && Array.isArray(venda.itens)) {
       return venda.itens.length;
     }
-    
-    // Fallback: se não tem itens, retorna 0
     return 0;
   }
 }

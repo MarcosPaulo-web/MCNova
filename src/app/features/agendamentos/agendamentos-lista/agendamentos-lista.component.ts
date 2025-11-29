@@ -18,7 +18,7 @@ declare var bootstrap: any;
   styleUrl: './agendamentos-lista.component.scss'
 })
 export class AgendamentosListaComponent implements OnInit {
-  private agendamentoService = inject(AgendamentoService);
+  public agendamentoService = inject(AgendamentoService);
   private clienteService = inject(ClienteService);
   private veiculoService = inject(VeiculoService);
   private usuarioService = inject(UsuarioService);
@@ -53,7 +53,6 @@ export class AgendamentosListaComponent implements OnInit {
     { value: StatusAgendamento.CANCELADO, label: 'Cancelado', class: 'danger' }
   ];
   
-  // ✅ Opções do dropdown de status
   statusDropdownOptions = [
     { value: StatusAgendamento.AGENDADO, label: 'Agendado', class: 'primary', icon: 'calendar-check' },
     { value: StatusAgendamento.EM_ANDAMENTO, label: 'Em Andamento', class: 'warning', icon: 'play-circle' },
@@ -72,7 +71,6 @@ export class AgendamentosListaComponent implements OnInit {
     }
   }
   
-  // ✅ Listener global para fechar dropdown ao clicar fora
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement;
@@ -90,7 +88,6 @@ export class AgendamentosListaComponent implements OnInit {
       observacoes: ['', [Validators.maxLength(1000)]]
     });
     
-    // Listener para carregar veículos quando selecionar cliente
     this.agendamentoForm.get('cdCliente')?.valueChanges.subscribe(cdCliente => {
       if (cdCliente) {
         this.carregarVeiculosCliente(cdCliente);
@@ -116,10 +113,8 @@ export class AgendamentosListaComponent implements OnInit {
   
   carregarAgendamentos(): Promise<void> {
     return new Promise((resolve) => {
-      // ✅ CORRIGIDO: Listar TODOS os agendamentos (incluindo os criados automaticamente pelas OS)
       this.agendamentoService.listarTodos().subscribe({
         next: (agendamentos) => {
-          // Ordenar por data (mais recentes primeiro)
           const agendamentosOrdenados = agendamentos.sort((a, b) => {
             return new Date(b.dataAgendamento).getTime() - new Date(a.dataAgendamento).getTime();
           });
@@ -129,7 +124,7 @@ export class AgendamentosListaComponent implements OnInit {
         },
         error: (error) => {
           console.error('Erro ao carregar agendamentos:', error);
-          alert('Erro ao carregar agendamentos: ' + (error.error?.message || error.message));
+          alert('Erro ao carregar agendamentos: ' + (error.message || 'Erro desconhecido'));
           resolve();
         }
       });
@@ -188,17 +183,15 @@ export class AgendamentosListaComponent implements OnInit {
     const termo = this.searchTerm.toLowerCase();
     let filtrados = this.agendamentos();
     
-    // Filtro por status
     if (this.filtroStatus() !== 'TODOS') {
       filtrados = filtrados.filter(a => a.status === this.filtroStatus());
     }
     
-    // Filtro por busca
     if (termo) {
       filtrados = filtrados.filter(agendamento =>
-        agendamento.nmCliente?.toLowerCase().includes(termo) ||
-        agendamento.placa?.toLowerCase().includes(termo) ||
-        agendamento.nmMecanico?.toLowerCase().includes(termo) ||
+        agendamento.nomeCliente?.toLowerCase().includes(termo) ||        // ✅ CORRIGIDO
+        agendamento.placaVeiculo?.toLowerCase().includes(termo) ||       // ✅ CORRIGIDO
+        agendamento.nomeMecanico?.toLowerCase().includes(termo) ||       // ✅ CORRIGIDO
         agendamento.observacoes?.toLowerCase().includes(termo)
       );
     }
@@ -211,8 +204,6 @@ export class AgendamentosListaComponent implements OnInit {
     this.aplicarFiltro();
   }
   
-  // ==================== DROPDOWN DE STATUS ====================
-  
   toggleDropdownStatus(agendamentoId: number, event: Event): void {
     event.stopPropagation();
     
@@ -221,7 +212,6 @@ export class AgendamentosListaComponent implements OnInit {
     } else {
       this.dropdownAbertoId.set(agendamentoId);
       
-      // ✅ Posicionar dropdown corretamente com position: fixed
       setTimeout(() => {
         const target = event.target as HTMLElement;
         const badge = target.closest('.status-clickable') as HTMLElement;
@@ -240,17 +230,14 @@ export class AgendamentosListaComponent implements OnInit {
     return this.dropdownAbertoId() === agendamentoId;
   }
   
-  // ✅ Mudar status do agendamento (sincroniza com OS automaticamente)
   mudarStatus(agendamento: Agendamento, novoStatus: StatusAgendamento, event: Event): void {
     event.stopPropagation();
     this.dropdownAbertoId.set(null);
     
-    // Se já está no mesmo status, não faz nada
     if (agendamento.status === novoStatus) {
       return;
     }
     
-    // Confirmação para mudanças críticas
     const mensagens: Record<StatusAgendamento, string> = {
       [StatusAgendamento.AGENDADO]: 'Deseja voltar este agendamento para AGENDADO?',
       [StatusAgendamento.EM_ANDAMENTO]: 'Deseja iniciar este agendamento? A Ordem de Serviço será atualizada automaticamente.',
@@ -272,19 +259,16 @@ export class AgendamentosListaComponent implements OnInit {
       error: (error) => {
         console.error('Erro ao atualizar status:', error);
         this.isLoading.set(false);
-        alert('❌ ' + (error.error?.message || 'Erro ao atualizar status do agendamento'));
+        alert('❌ ' + (error.message || 'Erro ao atualizar status do agendamento'));
       }
     });
   }
-  
-  // ==================== MODAL ====================
   
   abrirModalNovo(): void {
     this.modoEdicao.set(false);
     this.agendamentoEditando.set(null);
     this.agendamentoForm.reset();
     
-    // Data padrão: hoje
     const hoje = new Date();
     const dataFormatada = hoje.toISOString().split('T')[0];
     this.agendamentoForm.patchValue({
@@ -306,7 +290,6 @@ export class AgendamentosListaComponent implements OnInit {
       observacoes: agendamento.observacoes || ''
     });
     
-    // Carregar veículos do cliente
     if (agendamento.cdCliente) {
       this.carregarVeiculosCliente(agendamento.cdCliente);
     }
@@ -335,8 +318,7 @@ export class AgendamentosListaComponent implements OnInit {
       cdVeiculo: formValue.cdVeiculo,
       cdMecanico: formValue.cdMecanico,
       dataAgendamento: formValue.dataAgendamento,
-      observacoes: formValue.observacoes || undefined,
-      status: StatusAgendamento.AGENDADO
+      observacoes: formValue.observacoes || undefined
     };
     
     const operacao = this.modoEdicao()
@@ -353,13 +335,13 @@ export class AgendamentosListaComponent implements OnInit {
       error: (error) => {
         console.error('Erro ao salvar agendamento:', error);
         this.isSubmitting.set(false);
-        alert('Erro ao salvar agendamento: ' + (error.error?.message || error.message));
+        alert('Erro ao salvar agendamento: ' + (error.message || 'Erro desconhecido'));
       }
     });
   }
   
   confirmarCancelamento(agendamento: Agendamento): void {
-    if (confirm(`Deseja realmente cancelar o agendamento de ${agendamento.nmCliente} no dia ${this.formatarData(agendamento.dataAgendamento)}?`)) {
+    if (confirm(`Deseja realmente cancelar o agendamento de ${agendamento.nomeCliente} no dia ${this.formatarData(agendamento.dataAgendamento)}?`)) {
       this.agendamentoService.cancelar(agendamento.cdAgendamento).subscribe({
         next: () => {
           this.carregarAgendamentos();
@@ -367,13 +349,11 @@ export class AgendamentosListaComponent implements OnInit {
         },
         error: (error) => {
           console.error('Erro ao cancelar agendamento:', error);
-          alert('Erro ao cancelar agendamento: ' + (error.error?.message || error.message));
+          alert('Erro ao cancelar agendamento: ' + (error.message || 'Erro desconhecido'));
         }
       });
     }
   }
-  
-  // ==================== UTILS ====================
   
   getStatusLabel(status: StatusAgendamento): string {
     const statusObj = this.statusOptions.find(s => s.value === status);
