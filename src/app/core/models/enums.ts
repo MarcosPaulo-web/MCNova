@@ -23,7 +23,7 @@ export enum Status {
   AGENDADO = 'AGENDADO',
   EM_ANDAMENTO = 'EM_ANDAMENTO',
   CONCLUIDO = 'CONCLUIDO',
-  CANCELADO = 'CANCELADO'
+  CANCELADO = 'CANCELADO',
 }
 
 export enum TipoOrdemOrcamento {

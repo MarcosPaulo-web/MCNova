@@ -128,7 +128,7 @@ export interface OrdemServicoRequest {
 
 // ==================== ITEM ORDEM DE SERVICO ====================
 export interface ItemOrdemServico {
-  cdItemOrdemServico: number;
+  cdItem: number;
   cdProduto?: number;
   nomeProduto?: string;
   cdServico?: number;

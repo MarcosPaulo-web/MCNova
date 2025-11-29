@@ -132,39 +132,59 @@
                         </span>
                       }
                     </td>
-                    <!-- ✅ Dropdown de Status Clicável -->
-                    <td>
-                      <div class="status-dropdown-container">
-                        <span 
-                          class="badge status-clickable" 
-                          [ngClass]="getStatusClass(ordem.status)"
-                          (click)="toggleDropdownStatus(ordem.cdOrdemServico, $event)"
-                          title="Clique para alterar o status"
-                        >
-                          {{ getStatusLabel(ordem.status) }}
-                          <i class="bi bi-chevron-down ms-1"></i>
-                        </span>
-                        
-                        <!-- Dropdown Menu -->
-                        @if (isDropdownAberto(ordem.cdOrdemServico)) {
-                          <div class="status-dropdown-menu">
-                            @for (statusOpt of statusDropdownOptions; track statusOpt.value) {
-                              <div 
-                                class="status-dropdown-item"
-                                [class.active]="ordem.status === statusOpt.value"
-                                (click)="mudarStatus(ordem, statusOpt.value, $event)"
-                              >
-                                <i class="bi bi-{{ statusOpt.icon }} me-2" [class]="'text-' + statusOpt.class"></i>
-                                <span>{{ statusOpt.label }}</span>
-                                @if (ordem.status === statusOpt.value) {
-                                  <i class="bi bi-check2 ms-auto text-success"></i>
-                                }
-                              </div>
-                            }
-                          </div>
-                        }
-                      </div>
-                    </td>
+               
+
+                    <!-- ✅ STATUS: DIFERENTE PARA ORÇAMENTO E OS -->
+<td>
+  @if (ordem.tipoOrdemOrcamento === 'ORCAMENTO') {
+    <!-- ✅ ORÇAMENTOS: Badge fixo sem dropdown -->
+    @if (!ordem.aprovado) {
+      <span class="badge bg-warning text-dark pulse-badge">
+        <i class="bi bi-clock-history me-1"></i>
+        Pendente
+      </span>
+    } @else {
+      <span class="badge bg-info">
+        <i class="bi bi-check-circle me-1"></i>
+        Aprovado
+      </span>
+    }
+  } @else {
+    <!-- ✅ ORDENS DE SERVIÇO: Dropdown clicável -->
+    <div class="status-dropdown-container">
+      <span 
+        class="badge status-clickable" 
+        [ngClass]="getStatusClass(ordem.status)"
+        (click)="toggleDropdownStatus(ordem.cdOrdemServico, $event)"
+        title="Clique para alterar o status"
+      >
+        {{ getStatusLabel(ordem.status) }}
+        <i class="bi bi-chevron-down ms-1"></i>
+      </span>
+      
+      @if (isDropdownAberto(ordem.cdOrdemServico)) {
+        <div class="status-dropdown-menu">
+          @for (statusOpt of statusDropdownOptions; track statusOpt.value) {
+            <div 
+              class="status-dropdown-item"
+              [class.active]="ordem.status === statusOpt.value"
+              (click)="mudarStatus(ordem, statusOpt.value, $event)"
+            >
+              <i class="bi bi-{{ statusOpt.icon }} me-2" [class]="'text-' + statusOpt.class"></i>
+              <span>{{ statusOpt.label }}</span>
+              @if (ordem.status === statusOpt.value) {
+                <i class="bi bi-check2 ms-auto text-success"></i>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</td>
+
+
+
                     <td>
                       <strong class="text-success">{{ formatarMoeda(ordem.vlTotal) }}</strong>
                     </td>
