@@ -2,7 +2,7 @@
   <!-- Cabeçalho -->
   <div class="page-header">
     <div>
-      <h2>
+      <h2 class="text-body">
         <i class="bi bi-people me-2"></i>
         Clientes
       </h2>
@@ -65,13 +65,13 @@
           <tbody>
             @for (cliente of clientesFiltrados(); track cliente.cdCliente) {
             <tr>
-              <td>
+              <td class="text-body">
                 <strong>{{ cliente.nmCliente }}</strong>
               </td>
-              <td>{{ cliente.cpf || "-" }}</td>
-              <td>{{ cliente.telefone || "-" }}</td>
-              <td>{{ cliente.email || "-" }}</td>
-              <td class="text-center">
+              <td class="text-body">{{ cliente.cpf || "-" }}</td>
+              <td class="text-body">{{ cliente.telefone || "-" }}</td>
+              <td class="text-body">{{ cliente.email || "-" }}</td>
+              <td class="text-center text-body">
                 <div class="btn-group btn-group-sm">
                   <button
                     class="btn btn-outline-primary"
@@ -131,7 +131,7 @@
           <div class="row g-3">
             <!-- Nome -->
             <div class="col-md-12">
-              <label for="nmCliente" class="form-label">
+              <label for="nmCliente" class="form-label text-body">
                 Nome Completo <span class="text-danger">*</span>
               </label>
               <input
@@ -151,7 +151,7 @@
 
             <!-- CPF -->
             <div class="col-md-6">
-              <label for="cpf" class="form-label">
+              <label for="cpf" class="form-label text-body">
                 CPF <span class="text-danger">*</span>
               </label>
               <input
@@ -173,7 +173,7 @@
 
             <!-- Telefone -->
             <div class="col-md-6">
-              <label for="telefone" class="form-label">
+              <label for="telefone" class="form-label text-body">
                 Telefone <span class="text-danger">*</span>
               </label>
               <input
@@ -195,7 +195,7 @@
 
             <!-- Email -->
             <div class="col-md-12">
-              <label for="email" class="form-label">
+              <label for="email" class="form-label text-body">
                 Email <span class="text-danger">*</span>
               </label>
               <input
@@ -215,7 +215,9 @@
 
             <!-- Endereço -->
             <div class="col-md-12">
-              <label for="endereco" class="form-label">Endereço</label>
+              <label for="endereco" class="form-label text-body"
+                >Endereço</label
+              >
               <textarea
                 class="form-control"
                 id="endereco"

@@ -67,18 +67,18 @@
           <tbody>
             @for (veiculo of veiculosFiltrados(); track veiculo.cdVeiculo) {
             <tr>
-              <td>
+              <td class="text-body">
                 <strong class="placa">{{ veiculo.placa }}</strong>
               </td>
-              <td>{{ veiculo.modelo }}</td>
-              <td>{{ veiculo.marca || "-" }}</td>
-              <td>{{ veiculo.ano || "-" }}</td>
-              <td>
+              <td class="text-body">{{ veiculo.modelo }}</td>
+              <td class="text-body">{{ veiculo.marca || "-" }}</td>
+              <td class="text-body">{{ veiculo.ano || "-" }}</td>
+              <td class="text-body">
                 @if (veiculo.cor) {
                 <span class="badge bg-secondary">{{ veiculo.cor }}</span>
                 } @else { - }
               </td>
-              <td>
+              <td class="text-body">
                 <small>{{ getClienteNome(veiculo.cdCliente) || "-" }}</small>
               </td>
 
@@ -118,7 +118,6 @@
   }
 </div>
 
-<!-- Modal de Veículo -->
 <div class="modal fade" #veiculoModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -142,7 +141,7 @@
           <div class="row g-3">
             <!-- Cliente -->
             <div class="col-md-12">
-              <label for="cdCliente" class="form-label">
+              <label for="cdCliente" class="form-label text-body">
                 Cliente <span class="text-danger">*</span>
               </label>
               <select
@@ -167,7 +166,7 @@
 
             <!-- Placa -->
             <div class="col-md-6">
-              <label for="placa" class="form-label">
+              <label for="placa" class="form-label text-body">
                 Placa <span class="text-danger">*</span>
               </label>
               <input
@@ -192,7 +191,7 @@
 
             <!-- Ano -->
             <div class="col-md-6">
-              <label for="ano" class="form-label">
+              <label for="ano" class="form-label text-body">
                 Ano <span class="text-danger">*</span>
               </label>
               <input
@@ -212,7 +211,7 @@
 
             <!-- Modelo -->
             <div class="col-md-12">
-              <label for="modelo" class="form-label">
+              <label for="modelo" class="form-label text-body">
                 Modelo <span class="text-danger">*</span>
               </label>
               <input
@@ -232,7 +231,7 @@
 
             <!-- Marca -->
             <div class="col-md-6">
-              <label for="marca" class="form-label">
+              <label for="marca" class="form-label text-body">
                 Marca <span class="text-danger">*</span>
               </label>
               <input
@@ -252,7 +251,7 @@
 
             <!-- Cor -->
             <div class="col-md-6">
-              <label for="cor" class="form-label">Cor</label>
+              <label for="cor" class="form-label text-body">Cor</label>
               <input
                 type="text"
                 class="form-control"

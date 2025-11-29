@@ -13,7 +13,7 @@
   h2 {
     color: var(--text-dark);
     font-weight: 500;
-    
+
     i {
       color: var(--primary-color);
     }
@@ -32,7 +32,7 @@
 
   tbody tr {
     transition: background-color 0.2s ease;
-
+    color: var(--text-body);
     &:hover {
       background-color: rgba(11, 61, 145, 0.05);
     }
@@ -62,4 +62,8 @@
 
 .text-muted {
   font-size: 0.95rem;
+}
+
+.input-group-text {
+  background-color: var(--bg-body);
 }

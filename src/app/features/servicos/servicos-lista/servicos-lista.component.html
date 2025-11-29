@@ -63,7 +63,7 @@
           <tbody>
             @for (servico of servicosFiltrados(); track servico.cdServico) {
             <tr>
-              <td>
+              <td class="text-body">
                 <strong>{{ servico.nmServico }}</strong>
               </td>
               <td>
@@ -134,7 +134,7 @@
         <div class="modal-body">
           <div class="row g-3">
             <div class="col-12">
-              <label for="nmServico" class="form-label">
+              <label for="nmServico" class="form-label text-body">
                 Nome do Serviço <span class="text-danger">*</span>
               </label>
               <input
@@ -153,7 +153,9 @@
             </div>
 
             <div class="col-12">
-              <label for="dsServico" class="form-label">Descrição</label>
+              <label for="dsServico" class="form-label text-body"
+                >Descrição</label
+              >
               <textarea
                 class="form-control"
                 id="dsServico"
@@ -170,7 +172,7 @@
             </div>
 
             <div class="col-12">
-              <label for="vlServico" class="form-label">
+              <label for="vlServico" class="form-label text-body">
                 Valor (R$) <span class="text-danger">*</span>
               </label>
               <input
