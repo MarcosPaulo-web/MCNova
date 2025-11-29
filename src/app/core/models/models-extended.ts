@@ -209,4 +209,5 @@ export interface Faturamento {
   dataVenda: string;
   vlTotal: number;
   formaPagamento: FormaPagamento;
+  cliente?: string;
 }

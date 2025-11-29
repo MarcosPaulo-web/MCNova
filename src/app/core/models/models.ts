@@ -1,7 +1,4 @@
-// ========================================
-// src/app/core/models/models.ts
-// VERSÃO CORRIGIDA - Compatível com o Backend
-// ========================================
+
 
 import { UserRole, AuthProvider } from './enums';
 
