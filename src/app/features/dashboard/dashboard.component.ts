@@ -1,3 +1,5 @@
+// src/app/features/dashboard/dashboard.component.ts
+
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -7,7 +9,7 @@ import { ClienteService } from '../../core/services/cliente.service';
 import { OrdemServicoService } from '../../core/services/ordem-servico.service';
 import { ProdutoService } from '../../core/services/produto.service';
 import { AuthService } from '../../core/services/auth.service';
-import { StatusOrdemServico } from '../../core/models';
+import { Status } from '../../core/models';  
 import { Produto } from '../../core/models';
 
 interface DashboardStats {
@@ -51,7 +53,6 @@ export class DashboardComponent implements OnInit {
   carregarDashboard(): void {
     this.isLoading.set(true);
     
-    // Carrega todos os dados em paralelo
     Promise.all([
       this.carregarFaturamentoDia(),
       this.carregarClientesAtivos(),
@@ -92,8 +93,8 @@ export class DashboardComponent implements OnInit {
   
   private carregarOrdensAbertas(): Promise<void> {
     return new Promise((resolve) => {
-      // Busca ordens em andamento
-      this.ordemServicoService.listarPorStatus(StatusOrdemServico.EM_ANDAMENTO).subscribe({
+      // ✅ CORRIGIDO: Usa Status.EM_ANDAMENTO
+      this.ordemServicoService.listarPorStatus(Status.EM_ANDAMENTO).subscribe({
         next: (ordens) => {
           this.stats.update(s => ({ ...s, ordensAbertas: ordens.length }));
           resolve();
@@ -105,7 +106,7 @@ export class DashboardComponent implements OnInit {
     });
   }
   
-   private carregarProdutosEstoqueBaixo(): Promise<void> {
+  private carregarProdutosEstoqueBaixo(): Promise<void> {
     return new Promise((resolve) => {
       this.produtoService.buscarEstoqueBaixo().subscribe({
         next: (produtos: Produto[]) => {
