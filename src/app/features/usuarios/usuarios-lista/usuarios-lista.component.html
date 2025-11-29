@@ -18,7 +18,7 @@
   <div class="search-bar card">
     <div class="card-body">
       <div class="input-group">
-        <span class="input-group-text">
+        <span class="input-group-text bg-body">
           <i class="bi bi-search"></i>
         </span>
         <input
@@ -64,16 +64,16 @@
           <tbody>
             @for (usuario of usuariosFiltrados(); track usuario.cdUsuario) {
             <tr>
-              <td>
+              <td class="text-body">
                 <strong>{{ usuario.nmUsuario }}</strong>
               </td>
-              <td>{{ usuario.email }}</td>
-              <td>
+              <td class="text-body">{{ usuario.email }}</td>
+              <td class="text-body">
                 <span class="badge bg-info">
                   {{ getRolesLabel(usuario.roles) }}
                 </span>
               </td>
-              <td>
+              <td class="text-body">
                 <span
                   class="badge"
                   [ngClass]="getProviderBadgeClass(usuario.provider)"
@@ -89,7 +89,7 @@
                   {{ getProviderLabel(usuario.provider) }}
                 </span>
               </td>
-              <td>
+              <td class="text-body">
                 <small class="text-muted">-</small>
               </td>
               <td class="text-center">
@@ -150,7 +150,7 @@
           <div class="row g-3">
             <!-- Nome -->
             <div class="col-md-6">
-              <label for="nmUsuario" class="form-label">
+              <label for="nmUsuario" class="form-label text-body">
                 Nome Completo <span class="text-danger">*</span>
               </label>
               <input
@@ -169,7 +169,7 @@
             </div>
 
             <div class="col-md-6">
-              <label for="email" class="form-label">
+              <label for="email" class="form-label text-body">
                 Email <span class="text-danger">*</span>
               </label>
               <input
@@ -188,7 +188,7 @@
             </div>
 
             <div class="col-md-6">
-              <label for="cpf" class="form-label">
+              <label for="cpf" class="form-label text-body">
                 CPF <span class="text-danger">*</span>
               </label>
               <input
@@ -208,7 +208,9 @@
             </div>
 
             <div class="col-md-6">
-              <label for="telefone" class="form-label"> Telefone </label>
+              <label for="telefone" class="form-label text-body">
+                Telefone
+              </label>
               <input
                 type="text"
                 class="form-control"
@@ -226,7 +228,7 @@
             </div>
 
             <div class="col-12">
-              <label class="form-label">
+              <label class="form-label text-body">
                 Tipo de Autenticação <span class="text-danger">*</span>
               </label>
               <div class="d-flex gap-3">
@@ -240,7 +242,7 @@
                     formControlName="provider"
                   />
                   <label
-                    class="form-check-label"
+                    class="form-check-label text-body"
                     [for]="'provider_' + prov.value"
                   >
                     <i
@@ -261,7 +263,7 @@
 
             @if (usuarioForm.get('provider')?.value === 'LOCAL') {
             <div class="col-12">
-              <label for="senha" class="form-label">
+              <label for="senha" class="form-label text-body">
                 Senha @if (!modoEdicao()) {
                 <span class="text-danger">*</span>
                 }
@@ -291,7 +293,7 @@
             }
 
             <div class="col-12">
-              <label class="form-label">
+              <label class="form-label text-body">
                 Perfil de Acesso <span class="text-danger">*</span>
               </label>
               <div class="roles-container">
@@ -307,7 +309,10 @@
                     "
                     (change)="onRoleChange($event, role.value)"
                   />
-                  <label class="form-check-label" [for]="'role_' + role.value">
+                  <label
+                    class="form-check-label text-light"
+                    [for]="'role_' + role.value"
+                  >
                     {{ role.label }}
                   </label>
                 </div>
