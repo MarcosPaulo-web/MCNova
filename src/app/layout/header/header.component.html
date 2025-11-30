@@ -1,38 +1,81 @@
-<header class="header">
-  <div class="header-content">
-    <div class="header-title">
-      <h5 class="mb-0 text-body">Bem-vindo ao Sistema</h5>
-    </div>
+<nav class="navbar navbar-expand-lg bg-body px-3 border-bottom">
+  <div class="container-fluid">
+    <!-- Título -->
+    <a class="navbar-brand mb-0 h5 text-body"> Bem-vindo ao Sistema </a>
 
-    @if (currentUser(); as user) {
-    <div class="user-info">
-      <select
-        class="form-select form-select-sm w-auto text-body"
-        [value]="themeAtual"
-        (change)="trocarTema($event)"
-      >
-        <option value="light">Claro</option>
-        <option value="dark">Escuro</option>
-        <option value="access">Acessível</option>
-      </select>
-      <div class="user-details">
-        <span class="user-name text-body">{{ user.nmUsuario }}</span>
-        <span class="user-role text-body">{{ getRoleLabel(user.roles) }}</span>
+    <!-- Botão responsivo -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarUser"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarUser">
+      @if (currentUser(); as user) {
+
+      <!-- VISUAL EM DESKTOP -->
+      <div class="d-none d-lg-flex align-items-center gap-3">
+        <!-- Tema -->
+        <select
+          class="form-select form-select-sm w-auto text-body"
+          [value]="themeAtual"
+          (change)="trocarTema($event)"
+        >
+          <option value="light">Claro</option>
+          <option value="dark">Escuro</option>
+          <option value="access">Acessível</option>
+        </select>
+
+        <!-- Dados -->
+        <div class="text-end me-2">
+          <div class="fw-semibold text-body">{{ user.nmUsuario }}</div>
+          <small class="text-body">{{ getRoleLabel(user.roles) }}</small>
+        </div>
+
+        <!-- Avatar -->
+        <i class="bi bi-person-circle fs-4 text-primary"></i>
+
+        <!-- Botão sair -->
+        <button class="btn btn-sm btn-outline-danger ms-2" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i> Sair
+        </button>
       </div>
 
-      <div class="user-avatar">
-        <i class="bi bi-person-circle"></i>
-      </div>
+      <!-- VISUAL EM MOBILE (dropdown dentro do collapse) -->
+      <ul class="navbar-nav d-lg-none w-100 mt-3">
+        <li class="nav-item mb-2">
+          <select
+            class="form-select form-select-sm text-body"
+            [value]="themeAtual"
+            (change)="trocarTema($event)"
+          >
+            <option value="light">Claro</option>
+            <option value="dark">Escuro</option>
+            <option value="access">Acessível</option>
+          </select>
+        </li>
 
-      <button
-        class="btn btn-sm btn-outline-danger ms-3"
-        (click)="logout()"
-        title="Sair do Sistema"
-      >
-        <i class="bi bi-box-arrow-right"></i>
-        Sair
-      </button>
+        <li class="nav-item">
+          <span class="fw-semibold text-body">{{ user.nmUsuario }}</span
+          ><br />
+          <small class="text-body">{{ getRoleLabel(user.roles) }}</small>
+        </li>
+
+        <li class="nav-item fs-4 text-primary mt-2">
+          <i class="bi bi-person-circle"></i>
+        </li>
+
+        <li class="nav-item mt-3">
+          <button class="btn btn-danger w-100" (click)="logout()">
+            <i class="bi bi-box-arrow-right"></i> Sair
+          </button>
+        </li>
+      </ul>
+
+      }
     </div>
-    }
   </div>
-</header>
+</nav>
