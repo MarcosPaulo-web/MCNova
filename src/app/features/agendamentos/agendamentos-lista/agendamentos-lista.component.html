@@ -86,15 +86,15 @@
             @for (agendamento of agendamentosFiltrados(); track
             agendamento.cdAgendamento) {
             <tr>
-              <td>
+              <td class="text-body">
                 <strong>{{ formatarData(agendamento.dataAgendamento) }}</strong>
               </td>
-              <td>{{ agendamento.nmCliente || "-" }}</td>
+              <td class="text-body">{{ agendamento.nmCliente || "-" }}</td>
               <td>
                 <span class="placa">{{ agendamento.placaVeiculo || "-" }}</span>
               </td>
-              <td>{{ agendamento.nmMecanico || "-" }}</td>
-              <td>
+              <td class="text-body">{{ agendamento.nmMecanico || "-" }}</td>
+              <td class="text-body">
                 <small>{{ agendamento.observacoes || "-" }}</small>
               </td>
 
