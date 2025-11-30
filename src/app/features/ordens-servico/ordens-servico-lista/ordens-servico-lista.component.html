@@ -110,10 +110,10 @@
                   }
                 </strong>
               </td>
-              <td>
+              <td class="text-body">
                 <small>{{ formatarDataHora(ordem.dataAbertura) }}</small>
               </td>
-              <td>{{ getClienteNome(ordem) }}</td>
+              <td class="text-body">{{ getClienteNome(ordem) }}</td>
               <td>
                 <span class="placa">{{ ordem.placaVeiculo || "-" }}</span>
                 <br />
@@ -512,10 +512,12 @@
                         <span class="badge bg-primary">Serviço</span>
                         }
                       </td>
-                      <td>{{ item.nome }}</td>
-                      <td>{{ formatarMoeda(item.vlUnitario) }}</td>
-                      <td>{{ item.quantidade }}</td>
-                      <td>
+                      <td class="text-body">{{ item.nome }}</td>
+                      <td class="text-body">
+                        {{ formatarMoeda(item.vlUnitario) }}
+                      </td>
+                      <td class="text-body">{{ item.quantidade }}</td>
+                      <td class="text-body">
                         <strong>{{ formatarMoeda(item.vlTotal) }}</strong>
                       </td>
                       <td class="text-end">
