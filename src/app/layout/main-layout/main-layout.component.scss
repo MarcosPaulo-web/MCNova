@@ -4,14 +4,6 @@
   background-color: var(--content-bg);
 }
 
-.main-content {
-  flex: 1;
-  margin-left: 260px; // Largura da sidebar
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
 .content-area {
   flex: 1;
   padding: 2rem;
@@ -23,6 +15,4 @@
   .main-content {
     margin-left: 0;
   }
-  
-
 }

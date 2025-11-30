@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { Usuario } from '../../core/models';
@@ -6,15 +6,16 @@ import {
   AppTheme,
   ThemeService,
 } from 'src/app/core/services/themeService.service';
+import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SidebarComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   private authService = inject(AuthService);
   themeAtual: AppTheme = 'light';
   constructor(private themeService: ThemeService) {}
@@ -25,6 +26,7 @@ export class HeaderComponent {
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser.set(user);
     });
+    this.themeAtual = this.themeService.getTheme();
   }
 
   logout(): void {
