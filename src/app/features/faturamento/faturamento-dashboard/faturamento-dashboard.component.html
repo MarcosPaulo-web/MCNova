@@ -114,13 +114,13 @@
             @for (faturamento of faturamentosFiltrados(); track
             faturamento.cdFaturamento) {
             <tr>
-              <td>
+              <td class="text-body">
                 <strong>{{ formatarData(faturamento.dataVenda) }}</strong>
               </td>
 
-              <td>{{ faturamento.cliente || "-" }}</td>
+              <td class="text-body">{{ faturamento.cliente || "-" }}</td>
 
-              <td>
+              <td class="text-body">
                 @if (faturamento.cdOrdemServico) {
                 <span class="badge bg-primary">Ordem de Serviço</span>
                 } @else if (faturamento.cdVenda) {
