@@ -100,7 +100,7 @@
   .table-footer {
     padding: 1rem 1.25rem;
     border-top: 2px solid #dee2e6;
-    background-color: #f8f9fa;
+    background-color: var(--bg-body) !important;
     border-radius: 0 0 0.5rem 0.5rem;
 
     .text-success {
